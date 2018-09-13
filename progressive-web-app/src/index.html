@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coin Market App</title>
+  <!-- TODO add manifest here -->
+  <link rel="manifest" href="./manifest.json">
+  <!-- Google web fonts https://google.github.io/material-design-icons/ -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+</head>
+<body>
+  <div id="app">
+    <!-- route outlet -->
+    <!-- component matched by the route will render here -->
+    <transition name="fade" mode="out-in">
+      <router-view class="view"></router-view>
+    </transition>
+  </div>
+</body>
+</html>

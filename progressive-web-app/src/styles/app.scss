@@ -1,0 +1,263 @@
+@import '~normalize.css/normalize.css';
+@import '~material-components-web/dist/material-components-web.min.css';
+@import 'mdc-data-table';
+@import 'not-found';
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto';
+  height: 100%;
+  overflow-x: hidden;
+}
+
+#app {
+  height: 100%;
+
+  .red-text {
+    color: #F44336 !important;
+  }
+
+  .grey-text {
+    color: #757575 !important;
+  }
+
+  a {
+    text-decoration: none;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // https://github.com/vuejs/vue-router/tree/dev/examples/transitions
+  .child-view {
+    width: 100%;
+    position: absolute;
+    transition: all .5s cubic-bezier(.55,0,.1,1);
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s ease;
+  }
+
+  .fade-enter, .fade-leave-active {
+    opacity: 0;
+  }
+
+  .slide-left-enter, .slide-right-leave-active {
+    opacity: 0;
+    -webkit-transform: translate(30px, 0);
+    transform: translate(30px, 0);
+  }
+
+  .slide-left-leave-active, .slide-right-enter {
+    opacity: 0;
+    -webkit-transform: translate(-30px, 0);
+    transform: translate(-30px, 0);
+  }
+}
+
+.home {
+  display: flex;
+  height: 100vh;
+
+  .mdc-top-app-bar {
+    background-color: #58438a; // purple 700
+  }
+
+  .app-bar {
+    position: absolute;
+  }
+
+  .mdc-drawer {
+    .mdc-drawer__header {
+      display: flex;
+      .mdc-drawer__avatar {
+        display: flex;
+        margin-right: 10px;
+        img {
+          align-self: flex-end;
+          max-width: 50px;
+          max-height: 50px;
+        }
+      }
+      .mdc-drawer__info {
+        white-space: nowrap;
+        overflow: hidden;
+
+        h3, h6 {
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+      }
+    }
+  }
+
+  .mdc-drawer-app-content {
+    flex: auto;
+    overflow: auto;
+  }
+
+  .main-content {
+    overflow: auto;
+    height: 100%;
+    padding: 0 18px;
+
+    .mdc-top-app-bar--fixed-adjust {
+      margin-bottom: 18px;
+    }
+  }
+}
+
+.cryptocurrency {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+
+  img.cryptocurrency-symbol {
+    vertical-align: text-bottom;
+    width: 20px;
+  }
+}
+
+.help {
+  z-index: 7;
+}
+
+.sign-in {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  background: url(../images/bg.jpg) no-repeat center center fixed;
+  background-size: cover;
+
+
+  .sign-in-form {
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    background: #fff;
+    padding: 15px;
+    align-self:center;
+
+    .sign-in-header {
+      text-align: center;
+    }
+
+    .sign-in-body {
+      padding-bottom: 20px;
+
+      .email, .password {
+        display: block;
+        width: 300px;
+        margin: 20px auto 0;
+      }
+
+      .button-container {
+        margin: 20px auto 0;
+        display: flex;
+        justify-content: space-between;
+        .go-to-sign-up {
+          align-self: flex-end;
+        }
+        .button-sign-in {
+          align-self: flex-end;
+        }
+        .go-to-forgot-password {
+          margin-top: 1px;
+          align-self: flex-end;
+        }
+      }
+    }
+
+    .sign-in-footer {
+      font-family: Roboto,sans-serif;
+      font-weight: 500;
+      font-size: .875rem;
+      background: #ecf0f1;
+      border-color: #dee4e7;
+      border-bottom-right-radius: 3px;
+      border-bottom-left-radius: 3px;
+      text-align: center;
+      justify-content: center;
+      margin: 0 -15px -15px;
+      padding: 15px;
+    }
+  }
+}
+
+.sign-up {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  background: url(../images/bg.jpg) no-repeat center center fixed;
+  background-size: cover;
+
+
+  .sign-up-form {
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .1);
+    background: #fff;
+    padding: 15px;
+    align-self:center;
+
+    .sign-up-header {
+      text-align: center;
+    }
+
+    .sign-up-body {
+      .name, .email, .password {
+        display: block;
+        width: 300px;
+        margin: 20px auto 0;
+      }
+
+      .button-container {
+        margin: 20px auto 0;
+        display: flex;
+        justify-content: space-between;
+        .go-to-ign-up {
+          align-self: flex-end;
+        }
+        .button-sign-up {
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+
+  &.md-18 { font-size: 18px; }
+  &.md-24 { font-size: 24px; }
+  &.md-36 { font-size: 36px; }
+  &.md-48 { font-size: 48px; }
+}
