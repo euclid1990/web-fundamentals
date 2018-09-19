@@ -2,8 +2,8 @@
   <div id="sign-in" class="sign-in">
     <form class="sign-in-form" action="#" @submit.prevent="validateBeforeSubmit">
       <section class="sign-in-header">
-        <img src="../../images/icons/header.svg" width="100" height="100">
-        <h1>Coin Market App</h1>
+        <img src="../../images/icons/puzzle.svg" width="100" height="100">
+        <h1>PWA App</h1>
       </section>
       <section class="sign-in-body">
         <div v-if="message !== ''">

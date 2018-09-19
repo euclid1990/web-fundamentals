@@ -15,10 +15,9 @@ const routes = [
     component: App,
     children: [
       { path: '',
-        name: 'home',
         component: Home,
         children: [
-          { path: '', name: 'cryptocurrency', component: Cryptocurrency },
+          { path: '', name: 'home', component: Cryptocurrency },
           { path: 'weather', name: 'weather', component: Weather }
         ]
       },

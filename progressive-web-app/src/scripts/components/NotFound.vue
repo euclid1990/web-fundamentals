@@ -1,13 +1,5 @@
 <template>
   <div id="not-found" class="not-found">
-    <div id="clouds">
-      <div class="cloud x1"></div>
-      <div class="cloud x1_5"></div>
-      <div class="cloud x2"></div>
-      <div class="cloud x3"></div>
-      <div class="cloud x4"></div>
-      <div class="cloud x5"></div>
-    </div>
     <div class='c'>
       <div class='_404'>404</div>
       <hr>

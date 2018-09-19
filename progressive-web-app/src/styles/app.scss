@@ -58,6 +58,38 @@ body {
     -webkit-transform: translate(-30px, 0);
     transform: translate(-30px, 0);
   }
+
+  .autocomplete {
+    position: relative;
+
+    .autocomplete-items {
+      position: absolute;
+      border: 1px solid #d4d4d4;
+      border-bottom: none;
+      border-top: none;
+      z-index: 99;
+      /* Position the autocomplete items to be the same width as the container */
+      top: 100%;
+      left: 0;
+      right: 0;
+      opacity: 0.9;
+    }
+    .autocomplete-items div {
+      padding: 10px;
+      cursor: pointer;
+      background-color: #fff;
+      border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover {
+      /* When hovering an item */
+      background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+      /* when navigating through the items using the arrow keys */
+      background-color: DodgerBlue !important;
+      color: #ffffff;
+    }
+  }
 }
 
 .home {
@@ -102,12 +134,23 @@ body {
   }
 
   .main-content {
-    overflow: auto;
+    overflow: hidden;
     height: 100%;
     padding: 0 18px;
+    background: #ececec;
 
     .mdc-top-app-bar--fixed-adjust {
       margin-bottom: 18px;
+    }
+  }
+
+  @media only screen and (max-width: 767px)  {
+    .mdc-drawer--open+.mdc-drawer-app-content {
+      margin-left: 0;
+    }
+    .mdc-drawer--open~.mdc-drawer-scrim {
+      display: block;
+      background-color: rgba(0, 0, 0, .32);
     }
   }
 }
@@ -121,6 +164,242 @@ body {
   img.cryptocurrency-symbol {
     vertical-align: text-bottom;
     width: 20px;
+  }
+}
+
+.weather {
+  .weather-search {
+    padding: 15px;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14);
+
+    .city {
+      width: 100%;
+    }
+    .weather-location {
+      display: flex;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+
+      h2 {
+        color: #395d2f;
+        font-weight: 500;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        align-self: center;
+        margin: 0;
+      }
+      .mdc-fab {
+        align-self: center;
+        background-color: #45a92d;
+      }
+    }
+  }
+
+  .weather-fixed-adjust {
+    margin-bottom: 20px;
+  }
+
+  .weather-forecast {
+    padding: 16px;
+    position: relative;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    font-family: 'Helvetica', 'Verdana', sans-serif;
+    font-weight: 400;
+    font-display: optional;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #444;
+
+    .weather-location {
+      font-size: 1.75em;
+    }
+
+    .weather-date, .weather-description {
+      font-size: 1.25em;
+    }
+
+    .weather-current {
+      display: flex;
+
+      .weather-icon {
+        width: 104px;
+        height: 104px;
+      }
+
+      .weather-visual {
+        display: flex;
+        font-size: 4em;
+
+        .weather-scale {
+          font-size: 0.5em;
+          vertical-align: super;
+        }
+      }
+
+      .weather-visual, .weather-description {
+        flex-grow: 1;
+      }
+
+      .weather-sunset:before {
+        content: "Sunset: ";
+        color: #888;
+      }
+
+      .weather-wind:before {
+        content: "Wind: ";
+        color: #888;
+      }
+
+      .weather-sunrise:before {
+        content: "Sunrise: ";
+        color: #888;
+      }
+
+      .weather-humidity:before {
+        content: "Humidity: ";
+        color: #888;
+      }
+
+      .weather-pollen:before {
+        content: "Pollen Count: ";
+        color: #888;
+      }
+
+      .weather-pcount:before {
+        content: "Pollen ";
+        color: #888;
+      }
+    }
+
+    .weather-icon {
+      background-repeat: no-repeat;
+      background-size: contain;
+
+
+      &.weather-icon--clear-day {
+        background-image: url(../images/weathers/clear.png);
+      }
+
+      &.weather-icon--clear-night {
+        background-image: url(../images/weathers/clear.png);
+      }
+
+      &.weather-icon--rain {
+        background-image: url(../images/weathers/rain.png);
+      }
+
+      &.weather-icon--snow {
+        background-image: url(../images/weathers/snow.png);
+      }
+
+      &.weather-icon--sleet {
+        background-image: url(../images/weathers/sleet.png);
+      }
+
+      &.weather-icon--windy {
+        background-image: url(../images/weathers/wind.png);
+      }
+
+      &.weather-icon--fog {
+        background-image: url(../images/weathers/fog.png);
+      }
+
+      &.weather-icon--cloudy {
+        background-image: url(../images/weathers/cloudy.png);
+      }
+
+      &.weather-icon--partly-cloudy-day {
+        background-image: url(../images/weathers/partly-cloudy.png);
+      }
+
+      &.weather-icon--partly-cloudy-night {
+        background-image: url(../images/weathers/partly-cloudy.png);
+      }
+
+      &.weather-icon--thunderstorms {
+        background-image: url(../images/weathers/thunderstorm.png);
+      }
+    }
+
+    .weather-future {
+      display: flex;
+      .weather-oneday {
+        flex-grow: 1;
+        text-align: center;
+
+        .weather-icon {
+          width: 64px;
+          height: 64px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .weather-temp-high, .weather-temp-low {
+          display: inline-block;
+        }
+
+        .weather-temp-low {
+          color: #888;
+        }
+      }
+    }
+
+    @media (max-width: 520px) {
+      .weather-date, .weather-description {
+        font-size: 1.1em;
+      }
+
+      .weather-future {
+        .weather-oneday {
+          .weather-icon {
+            width: 48px;
+            height: 48px;
+          }
+        }
+      }
+    }
+
+    @media (max-width: 450px) {
+      .weather-date, .weather-description {
+        font-size: 0.9em;
+      }
+
+      .weather-temperature {
+        .weather-value {
+          font-size: 0.9em;
+        }
+
+        .weather-scale {
+          font-size: 0.9em;
+        }
+      }
+
+      .weather-current {
+        .weather-icon {
+          width: 72px;
+          height: 72px;
+        }
+
+        .weather-visual {
+          font-size: 2.5em;
+        }
+      }
+
+      .weather-future {
+        .weather-oneday {
+          .weather-icon {
+            width: 32px;
+            height: 32px;
+          }
+        }
+      }
+    }
   }
 }
 
