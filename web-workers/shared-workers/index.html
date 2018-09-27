@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Worker example: Shared workers</title>
+</head>
+<body>
+  <p>
+    <button id="push">push</button> | <button id="clear">clear</button> | <button id="view">Open a new viewer</button>
+  </p>
+  <p>
+    <strong>Log</strong>
+  </p>
+  <p>
+    <output id="output"></output>
+  </p>
+  <iframe src="inner.html" width="100%" height="300"></iframe>
+
+  <script>
+    const worker = new SharedWorker('worker.js', 'core'); /* sharedWorker = new SharedWorker(scriptURL [, name ]) */
+    const push = document.getElementById('push');
+    const clear = document.getElementById('clear');
+    const view = document.getElementById('view');
+    const output = document.getElementById('output');
+
+    worker.port.onmessage = function(e) {
+      let data = e.data;
+      switch (data.cmd) {
+        case '$c':
+          // Execute $ clear outout logs command
+          output.innerHTML = '';
+          break;
+        default:
+          // Show normal logs message
+          let pre = document.createElement('pre');
+          pre.textContent = data.msg;
+          output.appendChild(pre);
+      };
+    }
+
+    worker.port.postMessage({ cmd: '$l', msg: 'pingFromIndex' });
+
+    push.addEventListener('click', () => {
+      // Inform worker push new log.
+      worker.port.postMessage({ cmd: '$p', msg: 'Push new message' });
+    })
+
+    clear.addEventListener('click', () => {
+      // Inform worker clear all log.
+      worker.port.postMessage({ cmd: '$c', msg: '' });
+    })
+
+    view.addEventListener('click', () => {
+      // Open new window
+      window.open('index.html');
+    })
+  </script>
+</body>
+</html>

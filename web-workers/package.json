@@ -1,0 +1,9 @@
+{
+  "name": "web-workers",
+  "scripts": {
+    "start": "lite-server -c bs-config.js"
+  },
+  "devDependencies": {
+    "lite-server": "^2.4.0"
+  }
+}
