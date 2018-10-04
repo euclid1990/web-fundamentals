@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>The Service Worker Lifecycle</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+</head>
+<body>
+  <p>An image will appear here in <span id="clock">3</span> seconds:</p>
+
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // Register A service worker to install
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('ServiceWorker registration successful with scope: ', reg.scope))
+          .catch(err => console.log('ServiceWorker registration failed: ', err));
+
+        // This fires when the service worker controlling this page changes
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('A new worker has skipped waiting and become the new active worker.');
+        });
+
+        window.addEventListener('offline', () => {
+          const img = new Image();
+          img.src = '/img/bird.png';
+          document.body.appendChild(img);
+        });
+      });
+
+      function clockFn() {
+        clock = document.getElementById('clock');
+        +clock.textContent > 0 && window.setTimeout(() => {
+          clock.textContent = +clock.textContent - 1;
+          clockFn();
+        }, 1000);
+      }
+
+      clockFn();
+      setTimeout(() => {
+        const img = new Image();
+        img.src = '/img/pig.png';
+        document.body.appendChild(img);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

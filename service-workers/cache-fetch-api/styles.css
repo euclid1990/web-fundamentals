@@ -1,0 +1,54 @@
+body {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  justify-content: space-between;
+  margin: 0;
+  min-height: 100vh;
+  text-align: center;
+}
+
+h1 {
+  color: #444;
+  font-weight: 500;
+}
+
+h2 {
+  border-bottom: 1px solid #ddd;
+  color: #da0343;
+  margin: 25px;
+  padding: 0 0 5px 0;
+}
+
+p {
+  color: #444;
+  font-size: 1em;
+  line-height: 1.6em;
+  margin: 0 5vw;
+  text-align: center;
+}
+
+a {
+  color: #da0343;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 5px;
+}
+
+ul.fruitList {
+  display: flex;
+  justify-content: space-between;
+  flex-flow: row wrap;
+  align-items: stretch;
+}
+
+ul.fruitList li {
+  flex: 1 30%;
+}

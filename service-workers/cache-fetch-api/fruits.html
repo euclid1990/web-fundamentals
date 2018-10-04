@@ -1,0 +1,111 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Fruits</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Fruits page</h1>
+    <p><button onclick="cacheHtml()">Cache HTML page</button></p>
+  </header>
+  <main>
+    <ul class="fruitList">
+      <li id="apple">
+        <p><input type="checkbox" onclick="cacheFruit(this, '/img/apple.png')"></p>
+        <img src="/img/apple.png" alt="Apple" width="100">
+        <p>Apple</p>
+      </li>
+      <li id="banana">
+        <p><input id="" type="checkbox" onclick="cacheFruit(this, '/img/banana.png')"></p>
+        <img src="/img/banana.png" alt="Banana" width="100">
+        <p>Banana</p>
+      </li>
+      <li id="orange">
+        <p><input id="" type="checkbox" onclick="cacheFruit(this, '/img/orange.png')"></p>
+        <img src="/img/orange.png" alt="Orange" width="100">
+        <p>Orange</p>
+      </li>
+      <li id="pineapple">
+        <p><input id="" type="checkbox" onclick="cacheFruit(this, '/img/pineapple.png')"></p>
+        <img src="/img/pineapple.png" alt="Pineapple" width="100">
+        <p>Pineapple</p>
+      </li>
+      <li id="strawberry">
+        <p><input id="" type="checkbox" onclick="cacheFruit(this, '/img/strawberry.png')"></p>
+        <img src="/img/strawberry.png" alt="Strawberry" width="100">
+        <p>Strawberry</p>
+      </li>
+      <li id="tomato">
+        <p><input id="" type="checkbox" onclick="cacheFruit(this, '/img/tomato.png')"></p>
+        <img src="/img/tomato.png" alt="Tomato" width="100">
+        <p>Tomato</p>
+      </li>
+    </ul>
+  </main>
+  <footer>
+    <a href="/">Home</a>
+  </footer>
+  <script type="text/javascript">
+    const staticCacheName = 'pages-cache-v1';
+
+    function cacheHtml() {
+      const request = new Request('');
+      window.caches.open(staticCacheName)
+        .then(cache => {
+          cache.delete(request.url).then(() => {
+            window.fetch(request).then(response => {
+              cache.put(request.url, response);
+            });
+          });
+        });
+    }
+
+    function cacheFruit(self, src) {
+      const request = new Request(src);
+      if (self.checked) {
+        return window.fetch(request)
+          .then(response => {
+            return window.caches.open(staticCacheName)
+              .then(cache => {
+                type = response.headers.get('content-type');
+                // If offline fallback image > Do not cache it.
+                if (type.includes('svg')) {
+                  console.log('Offline fallback image offline.svg')
+                  return response;
+                }
+                cache.put(request.url, response.clone());
+                return response;
+              });
+          });
+      }
+      return window.caches.open(staticCacheName)
+        .then(cache => {
+          cache.delete(request.url);
+        });
+    }
+
+    // Set checkbox checked based on a variable retrieve from cache
+    window.caches.open(staticCacheName)
+      .then(cache => {
+        cache.keys().then(function(keys) {
+          keys.map((key) => {
+            try {
+              let url = key.url;
+              let filename = url.substring(url.lastIndexOf('/')+1);
+              let domId = filename.replace(/\.[^/.]+$/, '');
+              let cb = domId ? document.querySelector('#' + domId + ' input[type="checkbox"') : null;
+              if (cb !== null) {
+                cb.checked = true;
+              }
+            } catch(e) {
+              return false;
+            }
+          })
+        });
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Cache API / Fetch API</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Fruit blog</h1>
+  </header>
+  <main>
+    <section class="img">
+      <img src="/img/fruit-collection.jpg" alt="Fruit, tropical, colorful">
+    </section>
+    <h2>Welcome</h2>
+    <p>
+      Eating more summer fruits can help you look and feel fantastic.
+    </p>
+    <ul>
+      <li><a href="/fruits.html">Fruits collections</a></li>
+      <li><a href="/non-existent.html">Non-existent page</a></li>
+    </ul>
+  </main>
+  <footer>
+    <a href="#">Twitter</a> |
+    <a href="#">Facebook</a> |
+    <a href="#">Google+</a>
+  </footer>
+
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        // Register A service worker to install
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('ServiceWorker registration successful with scope: ', reg.scope))
+          .catch(err => console.log('ServiceWorker registration failed: ', err));
+
+        // This fires when the service worker controlling this page changes
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          console.log('A new worker has skipped waiting and become the new active worker.');
+        });
+      });
+    }
+  </script>
+</body>
+</html>
