@@ -67,3 +67,10 @@ Vue.mixin({
 const app = new Vue({ // eslint-disable-line no-unused-vars
   router
 }).$mount('#app');
+
+// Register the service worker if it's available
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('./service-worker.js')
+    .then(function() { console.log('Service Worker Registered'); });
+}

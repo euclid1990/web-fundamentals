@@ -1,0 +1,22 @@
+{
+  "sites": [
+    {
+      "host": "localhost",
+      "port": 7900,
+      "browserSyncPort": 8000,
+      "context": "/"
+    },
+    {
+      "host": "localhost",
+      "port": 8001,
+      "browserSyncPort": 8100,
+      "context": "service-workers/lifecycle"
+    },
+    {
+      "host": "localhost",
+      "port": 8002,
+      "browserSyncPort": 8200,
+      "context": "service-workers/cache-fetch-api"
+    }
+  ]
+}

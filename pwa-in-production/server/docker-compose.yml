@@ -1,0 +1,21 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:10.5
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: pwa_db
+      POSTGRES_USER: pwa_user
+      POSTGRES_PASSWORD: pwa_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer:4.6.3
+    restart: always
+    ports:
+      - 3001:8080

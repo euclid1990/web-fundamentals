@@ -65,6 +65,7 @@
 
 <script>
   import numeral from 'numeral';
+  import db from '../db';
 
   export default {
     data() {
@@ -84,6 +85,9 @@
         .then((response) => {
           if (response.code === this.httpStatus.OK) {
             this.cryptocurrencies = response.data.cryptocurrencies;
+            this.cryptocurrencies.length && db.cryptocurrencies.clear().then((result) => {
+              db.cryptocurrencies.bulkAdd(this.cryptocurrencies);
+            })
           }
           this.message = response.message;
         })
