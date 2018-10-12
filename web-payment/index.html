@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Payment</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style type="text/css">
+    h4 {
+      margin: 10px auto;
+    }
+    hr {
+      margin: 30px auto;
+    }
+    .buy {
+      margin-top: 10px;
+    }
+    button {
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Web Payment</h1>
+  </header>
+  <main>
+    <div>
+      <h2>Try it yourself</h2>
+      <div>
+        <p>1. <a target="_blank" href="https://localhost:8500/install.html">Install/Uninstall [MyPay] App</a></p>
+      </div>
+      <div class="order">
+        <p>2. Let's Order !</p>
+        <div>
+          <button type="button" id="id="can-make-payment"><strong>Can Make Payment</strong></button> <code id="can-make-payment-result">true</code>
+          <p>You can call <code>paymentRequest.canMakePayment()</code> before calling <code>paymentRequest.show()</code> to determine if the PaymentRequest object can be used to make a payment.</p>
+        </div>
+        <div class="order-detail">
+          <h4>Order Summary</h4>
+          <label>Total</label>
+          <input type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="amount" name="amount" value="320">
+          <input type="text" id="currency" name="currency" value="USD">
+        </div>
+        <div class="buy">
+          <button id="buy"><strong>Buy Now</strong></button>
+          <div class="payment-request-result">
+            <pre></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div>
+      <h2>Browser Support</h2>
+      <p class="ciu_embed" data-feature="payment-request" data-periods="future_1,current,past_1,past_2" data-accessible-colours="false">
+          <a href="http://caniuse.com/#feat=payment-request">Can I Use payment-request?</a> Data on support for the payment-request feature across the major browsers from caniuse.com.
+      </p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/gh/ireade/caniuse-embed/caniuse-embed.min.js"></script>
+  <script type="text/javascript">
+    if(window.PaymentRequest) {
+      // Use Payment Request API
+    } else {
+      // Fallback to traditional checkout
+      window.location.href = 'traditional-checkout.html';
+    }
+  </script>
+</body>
+</html>

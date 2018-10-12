@@ -4,17 +4,124 @@
   <meta charset="utf-8">
   <title>The Service Worker Lifecycle</title>
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style type="text/css">
+    .output {
+      background-color: #f0f0f0;
+      border-radius: 0.75em;
+      display: block;
+      margin: 0.5em;
+      padding: 0.5em;
+    }
+    #status {
+      margin: .5em 0;
+      font-style: italic;
+    }
+    #log {
+      margin: .5em 0;
+      white-space: pre-wrap;
+    }
+    #status:empty, #log:empty, #content:empty {
+      display: none;
+    }
+    .highlight {
+      border-radius: 0.75em;
+      border: 1px solid #f0f0f0;
+      display: block;
+      margin: 0.5em;
+      overflow-x: auto;
+      padding: 0.5em;
+    }
+    code {
+      font-family: Inconsolata, Consolas, monospace;
+    }
+  </style>
 </head>
 <body>
+  <div class="output">
+    <h2>Service Worker Availability</h2>
+    <p>
+      Service Workers <strong id="availability"></strong> available in your browser.
+      <em>(Whether <code>'serviceWorker' in navigator</code>.)</em>
+    </p>
+
+    <h2>Is This Page Controlled by a Service Worker?</h2>
+    <p>
+      This page <strong id="controlled"></strong> currently controlled.
+      <em>(Whether <code>navigator.serviceWorker.controller</code> is set.)</em>
+    </p>
+
+    <h2>Info about the Current Registration</h2>
+    <p>
+      The <code>navigator.serviceWorker.register()</code> call <strong id="register"></strong>.
+    </p>
+    <p>
+      The current registration represents the <strong id="kind"></strong> service worker.
+    </p>
+    <p>
+      <em>Tip:</em> With a newly registered service worker in the <code>activated</code> state,
+      refresh the page to have the service worker take control.
+      You can also refresh with the Shift key held down to load
+      the page without the service worker controlling it.
+    </p>
+    <p>State transitions of the service worker associated with the current registration:</p>
+    <ol id="states"></ol>
+  </div>
   <p>An image will appear here in <span id="clock">3</span> seconds:</p>
 
   <script type="text/javascript">
+    function logState(state) {
+      var liElement = document.createElement('li');
+      liElement.textContent = state;
+      document.querySelector('#states').appendChild(liElement);
+    }
+
     if ('serviceWorker' in navigator) {
+      // The current browser supports service workers.
+      document.querySelector('#availability').textContent = 'are';
+
+      // navigator.serviceWorker.controlled iff there is currently a service worker handling
+      // requests on this page for the current navigation.
+      document.querySelector('#controlled').textContent = navigator.serviceWorker.controller ? 'is' : 'is not';
+
       window.addEventListener('load', () => {
         // Register A service worker to install
-        navigator.serviceWorker.register('/service-worker.js')
-          .then(reg => console.log('ServiceWorker registration successful with scope: ', reg.scope))
-          .catch(err => console.log('ServiceWorker registration failed: ', err));
+        // override the default scope of '/' with './', so that the registration applies
+        // to the current directory and everything underneath it.
+        navigator.serviceWorker.register('/service-worker.js', { scope: './' })
+          .then(registration => {
+            // At this point, registration has taken place.
+            // The service worker will not handle requests until this page and any
+            // other instances of this page (in other tabs, etc.) have been
+            // closed/reloaded.
+            document.querySelector('#register').textContent = 'succeeded';
+
+            console.log('ServiceWorker registration successful with scope: ', registration.scope)
+
+            let serviceWorker;
+            if (registration.installing) {
+              serviceWorker = registration.installing;
+              document.querySelector('#kind').textContent = 'installing';
+            } else if (registration.waiting) {
+              serviceWorker = registration.waiting;
+              document.querySelector('#kind').textContent = 'waiting';
+            } else if (registration.active) {
+              serviceWorker = registration.active;
+              document.querySelector('#kind').textContent = 'active';
+            }
+
+            if (serviceWorker) {
+              logState(serviceWorker.state);
+              serviceWorker.addEventListener('statechange', function(e) {
+                logState(e.target.state);
+              });
+            }
+          }).catch(err => {
+            // Something went wrong during registration. The service-worker.js file
+            // might be unavailable or contain a syntax error.
+            document.querySelector('#register').textContent = 'failed: ' + err;
+
+            console.log('ServiceWorker registration failed: ', err)
+          });
 
         // This fires when the service worker controlling this page changes
         navigator.serviceWorker.addEventListener('controllerchange', () => {

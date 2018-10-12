@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Payment Service Providers (PSPs)</title>
+  <link rel="icon" href="img/mypay.png">
+  <!-- MyPay web app manifest -->
+  <link rel="manifest" href="manifest.json">
+  <style>
+  #installed img, #notinstalled img {
+    width: 24px;
+    vertical-align: middle;
+  }
+  .invisible {
+    display: none !important;
+  }
+  .error-message {
+    color: red;
+    font-size: smaller;
+  }
+</style>
+</head>
+<body>
+  <header class="header">
+    <h1>MyPay</h1>
+    <span>Install status:</span> <span id="status"></span>
+  </header>
+  <main>
+    <div>
+      <h2>MyPay is a sample payment service that works with Payment Request API</h2>
+      <p id="installed" class="badge-link invisible"><img src="img/uninstall.svg" alt="">
+        <a href="#uninstall" onclick="unregisterPaymentAppServiceWorker()">Uninstall MyPay Web Payment App</a>
+      </p>
+      <p id="notinstalled" class="badge-link invisible"><img src="img/download.svg" alt="">
+        <a href="#install" onclick="registerPaymentAppServiceWorker()">Install MyPay Web Payment App</a>
+      </p>
+      <p id="error" class="error-message"></p>
+    </div>
+  </main>
+
+  <script type="text/javascript">
+    const SERVICE_WORKER_URL = 'service-worker.js';
+    var reg;
+
+    // Shows/clears an error related to the service worker installation
+    function showError(msg) {
+      document.getElementById('error').innerHTML = msg;
+    }
+
+    // Shows/hides the webpage controls for installing/removing the service worker
+    function showStatus(enabled) {
+      showError('');
+      document.getElementById("status").innerHTML = enabled ? '✅' : '❎';
+      document.getElementById("installed").classList.toggle('invisible', !enabled);
+      document.getElementById("notinstalled").classList.toggle('invisible', enabled);
+    }
+
+    // Register a payment handler
+    function addInstruments(registration) {
+      return Promise.all([
+        registration.paymentManager.instruments.set(
+          'mypay-payment-method',
+          {
+            name: 'MyPay Account',
+            icons: [{
+              src: '/img/mypay.png',
+              sizes: '32x32',
+              type: 'image/png'
+            }],
+            method: 'https://localhost:8500/pay'
+          }
+        ),
+        registration.paymentManager.instruments.set(
+          'new-card',
+          {
+            name: 'Add new credit/debit card to MyPay',
+            method: 'basic-card',
+            capabilities: {
+              supportedNetworks: ['visa', 'mastercard', 'amex', 'discover'],
+              supportedTypes: ['credit', 'debit', 'prepaid']
+            }
+          }
+        )
+      ]);
+    };
+
+
+    // Registers the payment app service worker by installing the default instruments
+    function registerPaymentAppServiceWorker() {
+      navigator.serviceWorker.register(SERVICE_WORKER_URL).then(function(registration) {
+        if (!registration.paymentManager) {
+          // Payment app capability not available, unregister right away
+          registration.unregister().then((success) => {});
+          showError('Payment app capability not present. Enable flags?');
+          return;
+        }
+        // Prevent #Uncaught (in promise) DOMException: No active service worker
+        let sw = registration.installing || registration.waiting || registration.active;
+        if (sw) {
+          if (sw.state === 'activated') {
+            addInstruments(registration).then(function() {
+              showStatus(/*enabled=*/true);
+            });
+          }
+          sw.addEventListener('statechange', function(e) {
+            if (e.target.state === 'activated') {
+              addInstruments(registration).then(function() {
+                showStatus(/*enabled=*/true);
+              });
+            }
+          });
+        }
+      }).catch((error) => {
+        showError(error);
+      });
+    }
+
+    // Registers the payment app service worker by installing the default instruments
+    function unregisterPaymentAppServiceWorker() {
+      navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL).then(function(registration) {
+        registration.unregister().then((success) => {
+          showStatus(!success);
+        });
+      });
+    }
+
+    // When page is loaded, checks for the existence of the service worker
+    navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL).then(function(registration) {
+      if (registration) {
+        // If service worker is installed.
+        // Payment Handler API: https://w3c.github.io/payment-handler/
+        if (registration.paymentManager) {
+          // Always update the installed service worker.
+          registration.update();
+        } else {
+          // Not supposed to have a MyPay service worker if there is no
+          // paymentManager available (feature is now off?). Remove the
+          // service worker
+          unregisterPaymentAppServiceWorker();
+        }
+      }
+      showStatus(!!registration);
+    }).catch(err => showError('ServiceWorker registration failed: ' + err));
+  </script>
+</body>
+</html>

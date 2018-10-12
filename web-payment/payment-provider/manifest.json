@@ -1,0 +1,13 @@
+{
+  "name": "Pay with MyPay",
+  "short_name": "MyPay",
+  "icons": [{
+    "src": "img/mypay.png",
+    "sizes": "48x48",
+    "type": "image/png"
+  }],
+  "serviceworker": {
+    "src": "service-worker.js",
+    "use_cache": false
+  }
+}

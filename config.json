@@ -18,5 +18,19 @@
       "browserSyncPort": 8200,
       "context": "service-workers/cache-fetch-api"
     }
-  ]
+  ],
+  "cors": {
+    "host": "localhost",
+    "port": 7800
+  },
+  "payment": {
+    "host": "localhost",
+    "port": 8500,
+    "ssl": {
+      "key": "ssl.key",
+      "cert": "ssl.crt",
+      "ca": "ca.pem"
+    },
+    "context": "web-payment/payment-provider"
+  }
 }

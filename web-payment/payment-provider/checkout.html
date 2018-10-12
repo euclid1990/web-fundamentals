@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>You are paying with MyPay</title>
+  <link rel="icon" href="img/mypay.png">
+  <style type="text/css">
+    input {
+      width: 250px;
+      padding: 5px;
+      margin: 5px 0;
+      box-sizing: border-box;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+    }
+    button {
+      border-radius: 6px;
+      color: white;
+      font-size: 14px;
+      box-shadow: inset 0 0 0 1px #27496d;
+      cursor: pointer;
+      padding: 5px;
+      border: none;
+      margin: 5px;
+    }
+    h2 {
+      margin: 5px auto;
+    }
+    img {
+      width: 32px;
+      vertical-align: middle;
+    }
+    h2, img {
+      display: inline-block;
+    }
+    .input {
+      margin: 5px;
+    }
+    #pay {
+      background-color: blue;
+    }
+    #cancel {
+      background-color: red;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <header>
+      <img src="/img/mypay.png" alt="">
+      <h2>Enter Credit Card</h2>
+      <p>You are about to make payment: <strong id="amount"></strong> <span id="currency"></span></p>
+    </header>
+    <form id="creditcard" action="#">
+      <div class="input">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Card Name" value="Mr CUI BAP"></input>
+      </div>
+      <div class="input">
+        <label for="name">Card Number</label>
+        <input type="text" id="number" name="number" placeholder="4242 4242 4242 4242" value="4242 4242 4242 4242"></input>
+      </div>
+      <div class="input">
+        <label for="name">Expiration</label>
+        <input type="month" id="exp" name="exp" value="2020-10"></input>
+      </div>
+      <div class="input">
+        <label for="name">CVC</label>
+        <input type="number" id="cvc" name="cvc" value="438"></input>
+      </div>
+      <div>
+        <button type="button" id="cancel" onclick="onCancel(); return false;">Cancel</button>
+        <button type="button" id="pay" onclick="onPay(); return false;">Pay</button>
+      </div>
+    </form>
+    </div>
+  <script type="text/javascript">
+    let paymentRequestClient;
+    let data;
+    let methodName;
+
+    // Listen to messages from service worker
+    navigator.serviceWorker.addEventListener('message', e => {
+      // Preserve service worker object for later use
+      paymentRequestClient = e.source;
+      data = e.data;
+      switch (data.cmd) {
+        case 'PAYMENT_REQUEST_DETAIL':
+          document.getElementById('amount').innerText = data.total.value;
+          document.getElementById('currency').innerText = data.total.currency;
+          methodName = data.methodName;
+          break;
+      }
+    });
+
+    // Send `PAYMENT_APP_WINDOW_READY` command as a sign that the window is ready.
+    navigator.serviceWorker.controller.postMessage({
+      cmd: 'PAYMENT_APP_WINDOW_READY'
+    });
+
+    function onPay() {
+      // When `paymentRequestClient` is not found, there's no associated service worker
+      if (!paymentRequestClient) return;
+      const formData = new FormData(document.getElementById('creditcard'));
+      let details = {};
+      formData.forEach(function(value, key){
+          details[key] = value;
+      });
+      // Respond to the service worker with arbitrary message.
+      const response = {
+        cmd: 'MAKE_PAYMENT',
+        methodName: methodName,
+        details: details
+      };
+      paymentRequestClient.postMessage(response);
+      // Chrome will close all windows in the scope of the service worker
+      // after the service worker responds to the 'paymentrequest' event.
+    }
+
+    function onCancel() {
+      if (!paymentRequestClient) return;
+      const response = {
+        cmd: 'STOP_PAYMENT',
+        methodName: methodName,
+        details: {}
+      };
+      paymentRequestClient.postMessage(response);
+      // Chrome will close all windows in the scope of the service worker
+      // after the service worker responds to the 'paymentrequest' event.
+    }
+  </script>
+</body>
+</html>

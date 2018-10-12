@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover" />
+  <meta name="format-detection" content="telephone=no">
+  <title>Device APIs</title>
+  <style type="text/css">
+    .garden {
+      position: relative;
+      width : 200px;
+      height: 200px;
+      border: 5px solid #CCC;
+      border-radius: 10px;
+    }
+
+    .ball {
+      position: absolute;
+      top   : 90px;
+      left  : 90px;
+      width : 20px;
+      height: 20px;
+      background: green;
+      border-radius: 100%;
+    }
+
+    .display-mode {
+      display: none;
+      white-space: normal;
+    }
+
+    @media (display-mode: fullscreen) {
+      .display-mode {
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Device APIs</h1>
+  </header>
+  <main>
+    <h2>[Get Location] Using RIPE Database</h2>
+    <div>
+      <label for="ip">IP Address</label>
+      <input type="text" name="gender" id="ip" value="">
+      <button onclick="queryRipe()">Get</button>
+      <pre id="ripe" style="max-height: 500px; overflow-x: auto"></pre>
+    </div>
+    <h2>[Get Location] Using Geolocation API</h2>
+    <div>
+      <button onclick="geolocation()">Get</button>
+      <pre id="geolocation"></pre>
+
+    </div>
+    <h2>Device Orientation & Motion</h2>
+    <div>
+      <div class="garden">
+        <div class="ball"></div>
+      </div>
+      <pre id="orientation"></pre>
+    </div>
+    <h2>Making Fullscreen Experiences</h2>
+    <div>
+      <button onclick="toggleFullScreen()">Toggle Fullscreen</button>
+      <pre class="display-mode">
+        <a href="/">Display [Fullscreen] mode is visible. If you click here, Browser vendors will break out of fullscreen!</a>
+        <p>You have two options if you want to keep the user in a fullscreen experience:</p>
+        <ol>
+          <li>Use the installable web app mechanisms to go fullscreen.</li>
+          <li>Manage your UI and app state using the # fragment.</li>
+        </ol>
+      </pre>
+    </div>
+    <h2>Click to Call</h2>
+    <div>
+      <p>
+        NIST Telephone Time-of-Day Service
+        <a href="tel:+1-303-499-7111">+1 (303) 499-7111</a>
+      </p>
+      <p>
+        <button onclick="disablePhoneDetection()">Disable auto-detection when necessary</button>
+      </p>
+    </div>
+  </main>
+
+  <script type="text/javascript">
+    const defaults = {
+      timeout: 5000
+    };
+
+    const urls = {
+      v4: 'https://ipv4.icanhazip.com/',
+      v6: 'https://ipv6.icanhazip.com/'
+    };
+
+    const get = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o)
+
+    function fetch(url, doReject, opts = defaults) {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onerror = doReject(reject);
+        xhr.ontimeout = doReject(reject);
+        xhr.onload = () => {
+          if (xhr.status == 200) {
+            const result = xhr.responseText.trim();
+            resolve(result);
+          } else {
+            doReject(reject);
+          }
+        };
+        xhr.open('GET', url, true);
+        xhr.timeout = opts.timeout;
+        xhr.send();
+      });
+    }
+
+    function queryIp(version, opts = defaults) {
+      const url = urls[version];
+      const doReject = (reject) => {
+        return () => reject(new Error('Couldn\'t find your IP'))
+      };
+      return fetch(url, doReject).then((ip) => {
+        return ip.trim();
+      });
+    }
+
+    async function queryRipe() {
+      const ip = document.getElementById('ip').value;
+      const corsApiHost = location.protocol.concat('//') + window.location.hostname + ':7800/';
+      const inetEndpoint = corsApiHost + 'https://rest.db.ripe.net/search.json?type-filter=INETNUM&flags=resource&query-string=' + ip;
+      const geoEndpoint = 'https://stat.ripe.net/data/geoloc/data.json?resource=' + ip;
+      const sources = [inetEndpoint, geoEndpoint];
+      const doReject = (reject) => {
+        return () => reject(new Error('Couldn\'t find your IP information'))
+      };
+      let responses = sources.map(async(url) => {
+        let res = await fetch(url, doReject);
+        res = JSON.parse(res);
+        let inet = get(['objects', 'object', 0, 'attributes', 'attribute'], res);
+        let geo = get(['data', 'locations'], res);
+        return inet || geo || res;
+      });
+
+      Promise.all(responses).then((res) => {
+        document.getElementById('ripe').innerHTML = JSON.stringify(res, null, 2);
+      });
+    }
+
+    queryIp('v4').then(ip => {
+      document.getElementById('ip').value = ip;
+    });
+
+    function geolocation() {
+      const geolocation = document.getElementById('geolocation');
+
+      var geoSuccess = function(position) {
+        console.log(position);
+        geolocation.innerHTML = 'Latitude: ' + position.coords.latitude + '| Longitude: ' + position.coords.longitude;
+        const mapUrl = 'https://maps.google.com/maps?q=' + position.coords.latitude + ',' + position.coords.longitude + '&hl=en&z=14&output=embed';
+        const mapIframe = '<iframe src="' + mapUrl + '" width="100%" height="400" allowfullscreen></iframe>';
+        const map = document.createElement('iframe');
+        map.setAttribute('src', mapUrl);
+        map.setAttribute('width', '100%');
+        map.setAttribute('height', '400');
+        geolocation.appendChild(map);
+      };
+
+      var geoError = function(error) {
+        switch(error.code) {
+          case error.TIMEOUT:
+            geolocation.innerHTML = 'Timeout !';
+            break;
+          default:
+            geolocation.innerHTML = error.message;
+            break;
+        }
+      };
+
+      if (navigator.geolocation) {
+        console.log('Geolocation is supported!');
+        navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+      } else {
+        console.log('Geolocation is not supported for this Browser/OS.');
+      }
+    };
+
+    if (window.DeviceOrientationEvent) {
+      const ball   = document.querySelector('.ball');
+      const garden = document.querySelector('.garden');
+      const output = document.getElementById('orientation');
+      let maxX = garden.clientWidth  - ball.clientWidth;
+      let maxY = garden.clientHeight - ball.clientHeight;
+
+      function deviceOrientationHandler(event) {
+        let a = event.alpha; // In degree in the range [0,360]
+        let x = event.beta;  // In degree in the range [-180,180]
+        let y = event.gamma; // In degree in the range [-90,90]
+
+        output.innerHTML  = "alpha: " + a + "\n";
+        output.innerHTML += "beta : " + x + "\n";
+        output.innerHTML += "gamma: " + y + "\n";
+
+        // Because we don't want to have the device upside down
+        // We constrain the x value to the range [-90,90]
+        if (x >  90) { x =  90};
+        if (x < -90) { x = -90};
+
+        // To make computation easier we shift the range of x and y to [0,180]
+        x += 90;
+        y += 90;
+
+        // 10 is half the size of the ball
+        // It center the positioning point to the center of the ball
+        ball.style.top  = (maxX*x / 180 - 10) + "px";
+        ball.style.left = (maxY*y / 180 - 10) + "px";
+      }
+      window.addEventListener('deviceorientation', deviceOrientationHandler, false);
+      document.getElementById("orientation").innerText = 'Supported!';
+    }
+
+    function toggleFullScreen() {
+      var doc = window.document;
+      var docEl = doc.documentElement;
+
+      var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+      var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+
+      if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+        requestFullScreen.call(docEl);
+        console.log('Go to Fullscreen!');
+      }
+      else {
+        console.log('Exit Fullscreen!');
+        cancelFullScreen.call(doc);
+      }
+    }
+
+    function disablePhoneDetection() {
+      var counter = 0;
+      return function() {
+        const sheets = document.styleSheets;
+        const sheet = document.styleSheets[0];
+        if (counter % 2 === 0) {
+          sheet.insertRule('a[href^="tel"]{ color:inherit; text-decoration:none; cursor: text; }', 1);
+          const tel = document.querySelector('a[href^="tel"]');
+          tel.addEventListener('click', function(event) {
+            event.preventDefault();
+          }, false);
+        } else {
+          sheet.rules.forEach((v, k) => {
+            if (v.selectorText === 'a[href^="tel"]') {
+              sheet.removeRule (i);
+            }
+          });
+        }
+        counter++;
+      }
+    }
+  </script>
+</body>
+</html>

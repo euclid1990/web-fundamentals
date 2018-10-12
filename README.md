@@ -2,6 +2,34 @@
 
 All of things i've learned from https://developers.google.com/web/
 
+## Prerequisite
+
+Add root CA cert to the browser
+
+```
+Chromium -> Setting -> (Advanced) Manage Certificates -> Import -> 'ca.pem'
+```
+
+## Installation
+
+- You need Node.js v6 or higher to run this program. See [Installing Node.js via package manager](https://nodejs.org/en/download/package-manager/).
+
+- Clone project and install dependencies
+
+```terminal
+$ git clone git@github.com:euclid1990/web-fundamentals.git
+$ cd web-fundamentals
+$ yarn install
+```
+
+## Usage
+
+Run demo
+
+```terminal
+$ yarn start
+```
+
 ## Knowledge
 
 - Launch Android Emulators and iOS Simulators From the Command Line
