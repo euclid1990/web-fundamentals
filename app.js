@@ -74,7 +74,7 @@ corsProxy.createServer({
   })
   app.post('/charge', function(req, res) {
     let response = { methodName: req.body.methodName, details: {} };
-    if (+(req.body.total.value) < 100) {
+    if (+(req.body.total.value) < 150) {
       response.details = {
         ok: true,
         msg: 'Payment is completed'

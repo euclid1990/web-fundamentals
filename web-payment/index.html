@@ -19,6 +19,16 @@
     button {
       font-size: 13px;
     }
+    .payment-request-result {
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      display: block;
+      margin-top: 15px;
+      padding: 5px;
+    }
+    .margin-top-10 {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -34,14 +44,27 @@
       <div class="order">
         <p>2. Let's Order !</p>
         <div>
-          <button type="button" id="id="can-make-payment"><strong>Can Make Payment</strong></button> <code id="can-make-payment-result">true</code>
+          <button type="button" id="can-make-payment"><strong>Can Make Payment</strong></button> <code id="can-make-payment-result">-</code>
           <p>You can call <code>paymentRequest.canMakePayment()</code> before calling <code>paymentRequest.show()</code> to determine if the PaymentRequest object can be used to make a payment.</p>
         </div>
         <div class="order-detail">
           <h4>Order Summary</h4>
-          <label>Total</label>
-          <input type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="amount" name="amount" value="320">
-          <input type="text" id="currency" name="currency" value="USD">
+          <div>
+            <label>SanDisk 32GB USB 3.0</label>
+            <input type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="number" name="number" value="1"> * 65
+            <label>➡️ Amount</label>
+            <input type="text" pattern="-?[0-9]*(\.[0-9]+)?" id="amount" name="amount" value="65" disabled>
+            <input type="text" id="currency" name="currency" value="USD">
+          </div>
+          <div class="margin-top-10">
+            <label>Winter Discount</label>
+            <input type="text" id="discount" name="discount" value="10">
+            <label id="currencyLabel">USD</label>
+          </div>
+          <div class="margin-top-10">
+            <label>Purchase Amount:</label>
+            <strong><label id="purchaseAmount">55 USD</label></strong>
+          </div>
         </div>
         <div class="buy">
           <button id="buy"><strong>Buy Now</strong></button>
@@ -63,7 +86,259 @@
   <script src="https://cdn.jsdelivr.net/gh/ireade/caniuse-embed/caniuse-embed.min.js"></script>
   <script type="text/javascript">
     if(window.PaymentRequest) {
-      // Use Payment Request API
+      /**
+       * Builds PaymentRequest with multiple shipping options, but does not show any
+       * UI yet.
+       */
+      function initPaymentRequest() {
+        let basicCards = {
+          supportedMethods: ['basic-card'],
+          data: {
+            supportedNetworks: ['visa', 'master', 'jcb', 'amex', 'unionpay'],
+            supportedTypes: ['credit', 'debit', 'prepaid']
+          },
+        };
+
+        let myPay = {
+          supportedMethods: 'https://localhost:8500/pay'
+        }
+
+        let supportedInstruments = [basicCards, myPay];
+
+        let purchaseAmount = (amountInput.value - discountInput.value);
+        let currency = currencyInput.value;
+
+        let total = {
+          label: 'Purchase Amount', amount: {
+            currency: currency,
+            value: purchaseAmount
+          }
+        };
+
+        let displayItems = [
+          {
+            label: 'SanDisk 32GB USB 3.0',
+            amount: {currency: currency, value: amountInput.value},
+          },
+          {
+            label: 'Winter discount',
+            amount: {currency: currency, value: -discount.value},
+          },
+          {
+            label: 'Standard shipping',
+            amount: {currency: currency, value: 0.00},
+          },
+        ];
+
+        let shippingOptions = [
+          {
+            id: 'standard',
+            label: 'Standard shipping',
+            amount: {currency: currency, value: 0.00},
+            selected: true,
+          },
+          {
+            id: 'express',
+            label: 'Express shipping',
+            amount: {currency: currency, value: 12.00},
+          },
+        ];
+
+        let details = { total, displayItems, shippingOptions };
+
+        let options = {
+          requestPayerName: false,
+          requestPayerPhone: false,
+          requestPayerEmail: false,
+          requestShipping: true,
+        };
+
+        const paymentRequest = new PaymentRequest(
+          supportedInstruments,
+          details,
+          options);
+
+        paymentRequest.addEventListener(
+          'shippingaddresschange',
+          (event) => onShippingAddressChange(event, details, paymentRequest.shippingAddress)
+        );
+
+        paymentRequest.addEventListener(
+          'shippingoptionchange',
+          (event) => onShippingOptionChange(event, details, paymentRequest.shippingOption)
+        );
+
+        return paymentRequest;
+      }
+
+      /**
+       * Updates the shipping price and the total based on the shipping address.
+       */
+      function onShippingAddressChange(event, previousDetails, shippingAddress) {
+        const paymentRequest = event.target;
+        console.log(`Received a 'shippingaddresschange' event, change to: `,
+          paymentRequest.shippingAddress);
+        const shippingAddrCheckPromise = new Promise((resolve, reject) => {
+          setTimeout(() => resolve({
+            total: previousDetails.total,
+            displayItems: previousDetails.displayItems,
+            shippingOptions: previousDetails.shippingOptions
+          }), 1000);
+        });
+        event.updateWith(shippingAddrCheckPromise);
+      }
+
+      /**
+       * Updates the shipping price and the total based on the shipping address.
+       */
+      function onShippingOptionChange(event, previousDetails, shippingOption) {
+        const paymentRequest = event.target;
+        console.log(`Received a 'shippingoptionchange' event, change to: `,
+          paymentRequest.shippingOption);
+        let purchaseAmount = (amountInput.value - discountInput.value);
+        if (shippingOption === 'standard') {
+          selectedShippingOption = previousDetails.shippingOptions[0];
+          otherShippingOption = previousDetails.shippingOptions[1];
+          previousDetails.total.amount.value = purchaseAmount;
+        } else if (shippingOption === 'express') {
+          selectedShippingOption = previousDetails.shippingOptions[1];
+          otherShippingOption = previousDetails.shippingOptions[0];
+          previousDetails.total.amount.value = purchaseAmount + 12;
+        } else {
+          reject('Unknown shipping option \'' + shippingOption + '\'');
+          return;
+        }
+        selectedShippingOption.selected = true;
+        otherShippingOption.selected = false;
+        previousDetails.displayItems.splice(2, 1, selectedShippingOption);
+        event.updateWith(previousDetails);
+      }
+
+      /**
+       * Converts the payment instrument into a JSON string.
+       */
+      function paymentResponseToJsonString(response) {
+        details = response.details;
+
+        if (response.methodName === 'basic-card') {
+          details.cardNumber = 'XXXX-XXXX-XXXX-' + details.cardNumber.substr(12);
+          details.cardSecurityCode = '***';
+        }
+
+        return JSON.stringify({
+          methodName: response.methodName,
+          details: details,
+          shippingAddress: addressToDictionary(response.shippingAddress),
+          shippingOption: response.shippingOption,
+        }, undefined, 2);
+      }
+
+      /**
+       * Converts the shipping address into a dictionary.
+       */
+      function addressToDictionary(address) {
+        if (address.toJSON) {
+          return address.toJSON();
+        }
+
+        return {
+          recipient: address.recipient,
+          organization: address.organization,
+          addressLine: address.addressLine,
+          dependentLocality: address.dependentLocality,
+          city: address.city,
+          region: address.region,
+          postalCode: address.postalCode,
+          sortingCode: address.sortingCode,
+          country: address.country,
+          languageCode: address.languageCode,
+          phone: address.phone,
+        };
+      }
+
+      /**
+       * Simulates processing the payment data on the server.
+       */
+      function sendPaymentToServer(paymentResponse) {
+        // There's no server-side component of these samples. No transactions are
+        // processed and no money exchanged hands. Instantaneous transactions are not
+        // realistic. Add a 2 second delay to make it seem more real.
+        window.setTimeout(function() {
+          paymentResponse.complete('success')
+              .then(function() {
+                document.querySelector('.payment-request-result pre').innerHTML =
+                    paymentResponseToJsonString(paymentResponse);
+              })
+              .catch(function(err) {
+                console.error(err);
+              });
+        }, 2000);
+      }
+
+      /**
+       * Invokes PaymentRequest with multiple shipping options.
+       */
+      function onBuy(request) {
+        request.show().then(function(instrumentResponse) {
+          sendPaymentToServer(instrumentResponse);
+        })
+        .catch(function(err) {
+          console.group('The promise from `paymentRequest.show()` was rejected.');
+          console.warn('This is normally due to the user closing or cancelling the payment request UI.');
+          console.warn(`The error message received was: '${err.message}'`);
+          console.groupEnd();
+        });
+      }
+
+      /**
+       * Determine if the PaymentRequest object can be used to make a payment.
+       */
+      function onCanMakePayment() {
+        let request = initPaymentRequest();
+        const canMakePaymentResult = document.getElementById('can-make-payment-result');
+        request.canMakePayment()
+          .then((result) => {
+            canMakePaymentResult.textContent = JSON.stringify(result, null, 2);
+          })
+          .catch((err) => {
+            canMakePaymentResult.textContent = err.message;
+          });
+      }
+
+      const purchaseAmount = document.getElementById('purchaseAmount');
+      const updatePurchaseAmount = () => {
+        purchaseAmount.innerText = (amountInput.value - discountInput.value) + ' ' + currencyInput.value;
+      }
+
+      const numberInput = document.getElementById('number');
+      const amountInput = document.getElementById('amount');
+      numberInput.addEventListener('change', (e) => {
+        amountInput.value = e.target.value * 65;
+        updatePurchaseAmount();
+      });
+
+      const currencyInput = document.getElementById('currency');
+      const currencyLabel = document.getElementById('currencyLabel');
+      currencyInput.addEventListener('change', (e) => {
+        currencyLabel.innerText = e.target.value;
+        updatePurchaseAmount();
+      });
+
+      const discountInput = document.getElementById('discount');
+      discountInput.addEventListener('change', (e) => {
+        updatePurchaseAmount();
+      });
+
+      const buyButton = document.getElementById('buy');
+      buyButton.addEventListener('click', (e) => {
+        let request = initPaymentRequest();
+        onBuy(request);
+      });
+
+      const canMakePaymentButton = document.getElementById('can-make-payment');
+      canMakePaymentButton.addEventListener('click', (e) => {
+        onCanMakePayment();
+      });
     } else {
       // Fallback to traditional checkout
       window.location.href = 'traditional-checkout.html';
