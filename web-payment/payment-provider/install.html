@@ -42,6 +42,7 @@
 
   <script type="text/javascript">
     const SERVICE_WORKER_URL = 'service-worker.js';
+    const CACHE_NAME = 'static';
     var reg;
 
     // Shows/clears an error related to the service worker installation
@@ -120,9 +121,9 @@
     // Registers the payment app service worker by installing the default instruments
     function unregisterPaymentAppServiceWorker() {
       navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL).then(function(registration) {
-        registration.unregister().then((success) => {
-          showStatus(!success);
-        });
+        window.caches.delete(CACHE_NAME).then(cache =>
+          registration.unregister().then((success) => showStatus(!success))
+        );
       });
     }
 

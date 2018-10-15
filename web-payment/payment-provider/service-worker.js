@@ -2,15 +2,36 @@ const ORIGIN = 'https://localhost:8500';
 const METHOD_NAME = `${ORIGIN}/pay`;
 const CHECKOUT_URL = `${ORIGIN}/checkout`;
 const CHARGE_URL = `${ORIGIN}/charge`;
+const CACHE_NAME = 'static';
+const FILES_TO_CACHE = [
+  '/pay.html',
+  '/install.html',
+  '/img/download.svg',
+  '/img/uninstall.svg',
+  '/img/mypay.png',
+];
 let resolve, reject, paymentRequestEvent;
 
 self.addEventListener('install', event => {
   console.log('[sw] installing…');
-  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE)).then(() => {
+      console.log('[' + CACHE_NAME + '] is created and stored.')
+      self.skipWaiting();
+    })
+  );
 });
 
 self.addEventListener('activate', event => {
   console.log('[sw] now ready to handle');
+  event.waitUntil(
+    caches.keys().then(keyList => {
+      return Promise.all(keyList.map(key => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      }));
+    })
+  );
+  return self.clients.claim();
 });
 
 self.addEventListener('canmakepayment', function(e) {
@@ -96,3 +117,33 @@ const createCharge = (data) => {
     resolve(data);
   });
 }
+
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+
+  console.log('Fetch event for ', e.request.url);
+  e.respondWith(
+    // Try the cache
+    caches.match(e.request).then(response => {
+      if (response) {
+        console.log('Found ', e.request.url, ' in cache');
+        return response;
+      }
+      // Fall back to network
+      console.log('Network request for ', e.request.url);
+      return fetch(e.request)
+        .then(response => {
+          // If it not in files to cache
+          if (!~FILES_TO_CACHE.indexOf(url.pathname)) {
+            return response;
+          }
+
+          return caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(url.pathname, response.clone());
+              return response;
+            });
+        });
+    })
+  );
+});
