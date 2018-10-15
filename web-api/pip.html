@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Picture-in-Picture</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    video {
+      background: #1e2327;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 500px;
+    }
+    button {
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Picture-in-Picture</h1>
+    <span>Available in <a target="_blank" href="https://www.chromestatus.com/feature/5729206566649856">Chrome 70+</a></span>
+  </header>
+  <main>
+    <div>
+      <h2>Enable Chrome's new Picture-in-Picture mode</h2>
+      <ol>
+        <li>chrome://flags/#enable-experimental-web-platform-features -- Enables experimental Web Platform features that are in development.</li>
+        <li>chrome://flags/#enable-surfaces-for-videos .. Enable compositing onto a Surface instead of a VideoLayer for videos.</li>
+        <li>chrome://flags/#enable-picture-in-picture -- Enable the Picture-in-Picture feature for videos</li>
+      </ol>
+    </div>
+    <div>
+      <h2>Background</h2>
+      <p>The Picture-in-Picture API allows websites to create a floating video window that is always on top of other windows so that users may continue consuming media while they interact with other sites or applications on their device.</p>
+      <video id="video" controls playsinline
+        src="https://storage.googleapis.com/media-session/caminandes/short.mp4"
+        poster="https://storage.googleapis.com/media-session/caminandes/artwork-512.png">
+      </video>
+      <div>
+        <button id="togglePipButton">Toggle Picture-in-Picture</button>
+        <pre id="log"></pre>
+      </div>
+    </div>
+  </main>
+
+  <script type="text/javascript">
+    function log() {
+      let line = Array.prototype.slice.call(arguments).map(function(argument) {
+        return typeof argument === 'string' ? argument : JSON.stringify(argument);
+      }).join(' ');
+      document.getElementById('log').textContent += line + '\n';
+    }
+
+    function clearLog() {
+      document.getElementById('log').textContent = '';
+    }
+
+    if (!('pictureInPictureEnabled' in document)) {
+      log('The Picture-in-Picture API is not available.');
+    } else if (!document.pictureInPictureEnabled) {
+      log('The Picture-in-Picture API is disabled.');
+    }
+
+    let pipWindow;
+
+    togglePipButton.addEventListener('click', async function(event) {
+      log('Toggling Picture-in-Picture...');
+      togglePipButton.disabled = true;
+      try {
+        if (video !== document.pictureInPictureElement)
+          await video.requestPictureInPicture();
+        else
+          await document.exitPictureInPicture();
+
+      } catch(error) {
+        log(`> Argh! ${error}`);
+      } finally {
+        togglePipButton.disabled = false;
+      }
+    });
+
+    video.addEventListener('enterpictureinpicture', function(event) {
+      log('> Video entered Picture-in-Picture');
+
+      if (!!event.pictureInPictureWindow) {
+        pipWindow = event.pictureInPictureWindow;
+        log(`> Window size is ${pipWindow.width}x${pipWindow.height}`);
+
+        pipWindow.addEventListener('resize', onPipWindowResize);
+      }
+    });
+
+    function onPipWindowResize(event) {
+      log(`> Window size changed to ${pipWindow.width}x${pipWindow.height}`);
+    }
+  </script>
+</body>
+</html>
