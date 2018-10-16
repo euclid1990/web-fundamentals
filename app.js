@@ -92,3 +92,21 @@ corsProxy.createServer({
     console.log(`Listening Payment Service on https://${payment.host}:${payment.port} with context=${payment.context}`);
   });
 })();
+
+// Self Notification Service
+(function() {
+  let notification = config.notification;
+  const key = fs.readFileSync(notification.ssl.key);
+  const cert = fs.readFileSync(notification.ssl.cert);
+  const ca = fs.readFileSync(notification.ssl.ca);
+  const credentials = { key, cert, ca };
+  const app = express();
+  const server = https.createServer(credentials, app);
+  app.use(morgan(`[${notification.context}] :method :url :status - :response-time ms :res[content-length] bytes`));
+  app.get('/favicon.ico', (req, res) => res.status(204));
+  app.use(express.static(path.join(__dirname, notification.context)));
+  server.listen(notification.port, notification.host, function() {
+    let proxy = `${notification.host}:${notification.port}`;
+    console.log(`Listening notification Service on https://${notification.host}:${notification.port} with context=${notification.context}`);
+  });
+})();

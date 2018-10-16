@@ -2,6 +2,10 @@
 
 All of things i've learned from https://developers.google.com/web/
 
+## Slide
+
+- TBD
+
 ## Prerequisite
 
 Add root CA cert to the browser
@@ -46,6 +50,8 @@ $ open -a Simulator
 - Use `10.0.2.2` to access actual machine localhost in the Android emulator.
 
 - [Inspect and debug live content on your Android device from your development machine.](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/)
+
+- [Use Web Inspector to Debug Mobile Safari](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html)
 
 ## Contributing
 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Web Push Notification</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    pre {
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    button, input {
+      font-size: 13px;
+    }
+    .output {
+      background-color: #f0f0f0;
+      border-radius: 8px;
+      display: block;
+      margin: 10px;
+      padding: 10px;
+    }
+    input {
+      width: 50%;
+    }
+    .block-title {
+      position: relative;
+      top: 10px;
+      z-index: 10;
+      display: block;
+      padding: 10px 5px;
+      font-size: 75%;
+      color: #fff;
+      cursor: pointer;
+      background-color: #027de7;
+      border: 0;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .block-title > button {
+      float: right;
+      position: relative;
+      top: -3px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>Sending a Push Message Using Firebase Cloud Messaging</h1>
+  </header>
+  <main>
+    <div>
+      <button id="notify">Get Notification Permission</button>
+      <button id="add">Add to Topic [news]</button>
+      <button id="push">Push to [news]</button>
+    </div>
+    <div class="output">
+      <span class="block-title">Logs <button onclick="clearLog()">⌫</button></span>
+      <pre id="log"></pre>
+    </div>
+    <div>
+      <input type="text" id="server_key" name="server_key" value="" placeholder="Enter {Server key} or {Legacy server key}">
+      <a target="_blank" href="./Firebase_Settings_CloudMessaging.png">How to get {Server key} and {Legacy server key}?</a>
+    </div>
+    <div class="output">
+      <span class="block-title">Curl <button class="clipboard" data-clipboard-target="#curl">✄</button></span>
+      <pre id="curl"></pre>
+    </div>
+    <div class="output">
+      <span class="block-title">Curl Background Message Handler <button class="clipboard" data-clipboard-target="#curl-background">✄</button></span>
+      <pre id="curl-background"></pre>
+    </div>
+    <pre>
+</pre>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/5.5.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.3/firebase-messaging.js"></script>
+  <script src="clipboard.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

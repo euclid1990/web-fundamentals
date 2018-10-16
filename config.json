@@ -32,5 +32,15 @@
       "ca": "ca.pem"
     },
     "context": "web-payment/payment-provider"
+  },
+  "notification": {
+    "host": "localhost",
+    "port": 8600,
+    "ssl": {
+      "key": "ssl.key",
+      "cert": "ssl.crt",
+      "ca": "ca.pem"
+    },
+    "context": "web-push-notification"
   }
 }
