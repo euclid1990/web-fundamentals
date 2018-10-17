@@ -13,12 +13,12 @@ self.addEventListener('install', event => {
   console.log('Attempting to install service worker and cache static assets');
   event.waitUntil(
     caches.open(staticCacheName)
-    .then(cache => {
-      return cache.addAll(filesToCache);
-    })
-    .then(() => {
-      self.skipWaiting();
-    })
+      .then(cache => {
+        return cache.addAll(filesToCache);
+      })
+      .then(() => {
+        self.skipWaiting();
+      })
   );
 });
 
@@ -80,7 +80,7 @@ self.addEventListener('fetch', event => {
       if (event.request.url.match(/\.(jpe?g|png|gif|svg)$/)) {
         return new Response(
           '<svg role="img" aria-labelledby="offline-title" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><title id="offline-title">Offline</title><path fill="rgba(145,145,145,0.5)" d="M0 0h400v225H0z" /><text fill="rgba(0,0,0,0.33)" font-family="Helvetica Neue,Arial,sans-serif" font-size="30" text-anchor="middle" x="50" y="50" dominant-baseline="central">offline</text></svg>',
-          { headers: { 'Content-Type': 'image/svg+xml' }}
+          { headers: { 'Content-Type': 'image/svg+xml' } }
         );
       }
       // If both fail, show a generic fallback:

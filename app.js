@@ -19,13 +19,13 @@ for (let site of config.sites) {
     console.log(`Listening on http://${proxy} with context=${site.context}`);
 
     browserSync.create().init({
-        files: [path.join(__dirname, site.context, '/**/*.{html,js,css}')],
-        online: false,
-        open: false,
-        port: site.browserSyncPort,
-        proxy: proxy,
-        ui: false,
-        ghostMode: false
+      files: [path.join(__dirname, site.context, '/**/*.{html,js,css}')],
+      online: false,
+      open: false,
+      port: site.browserSyncPort,
+      proxy: proxy,
+      ui: false,
+      ghostMode: false
     });
 
     // Open index.html on browsers
@@ -38,11 +38,11 @@ for (let site of config.sites) {
 
 // Proxy which adds CORS headers to the proxied request
 corsProxy.createServer({
-    originWhitelist: [],
-    requireHeader: ['origin', 'x-requested-with'],
-    removeHeaders: ['cookie', 'cookie2']
+  originWhitelist: [],
+  requireHeader: ['origin', 'x-requested-with'],
+  removeHeaders: ['cookie', 'cookie2']
 }).listen(config.cors.port, config.cors.host, function() {
-    console.log(`Listening CORS Proxy on http://${config.cors.host}:${config.cors.port}`);
+  console.log(`Listening CORS Proxy on http://${config.cors.host}:${config.cors.port}`);
 });
 
 // Self Payment Service Provider
@@ -62,16 +62,16 @@ corsProxy.createServer({
   app.use(function(req, res, next) {
     // Payment Method Manifest: https://w3c.github.io/payment-method-manifest/
     res.status(200).links({
-      'payment-method-manifest': 'https://localhost:8500/payment-manifest.json',
+      'payment-method-manifest': 'https://localhost:8500/payment-manifest.json'
     });
     return next();
   });
   app.get('/pay', function(req, res) {
     res.sendFile(path.join(__dirname, payment.context, 'pay.html'));
-  })
+  });
   app.get('/checkout', function(req, res) {
     res.sendFile(path.join(__dirname, payment.context, 'checkout.html'));
-  })
+  });
   app.post('/charge', function(req, res) {
     let response = { methodName: req.body.methodName, details: {} };
     if (+(req.body.total.value) < 150) {
@@ -86,9 +86,8 @@ corsProxy.createServer({
       };
     }
     res.json(response);
-  })
+  });
   server.listen(payment.port, payment.host, function() {
-    let proxy = `${payment.host}:${payment.port}`;
     console.log(`Listening Payment Service on https://${payment.host}:${payment.port} with context=${payment.context}`);
   });
 })();
@@ -106,7 +105,6 @@ corsProxy.createServer({
   app.get('/favicon.ico', (req, res) => res.status(204));
   app.use(express.static(path.join(__dirname, notification.context)));
   server.listen(notification.port, notification.host, function() {
-    let proxy = `${notification.host}:${notification.port}`;
     console.log(`Listening notification Service on https://${notification.host}:${notification.port} with context=${notification.context}`);
   });
 })();

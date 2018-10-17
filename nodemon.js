@@ -7,7 +7,7 @@ nodemon({ script: 'app.js' })
   .on('start', () => {
     console.log('Nodemon started');
   })
-  .on('quit', function () {
+  .on('quit', function() {
     fs.existsSync(opnLockFile) && fs.unlinkSync(opnLockFile);
     process.exit(0);
-  })
+  });

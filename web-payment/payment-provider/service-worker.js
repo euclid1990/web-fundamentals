@@ -8,7 +8,7 @@ const FILES_TO_CACHE = [
   '/install.html',
   '/img/download.svg',
   '/img/uninstall.svg',
-  '/img/mypay.png',
+  '/img/mypay.png'
 ];
 let resolve, reject, paymentRequestEvent;
 
@@ -16,7 +16,7 @@ self.addEventListener('install', event => {
   console.log('[sw] installing…');
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE)).then(() => {
-      console.log('[' + CACHE_NAME + '] is created and stored.')
+      console.log('[' + CACHE_NAME + '] is created and stored.');
       self.skipWaiting();
     })
   );
@@ -38,18 +38,19 @@ self.addEventListener('canmakepayment', function(e) {
   e.respondWith(true);
 });
 
-self.addEventListener('paymentrequest', (e)=>{
-  paymentRequestEvent = e,
+self.addEventListener('paymentrequest', (e) => {
+  paymentRequestEvent = e;
 
   // Return PromiseResolver
-  e.respondWith(new Promise((a,b) => {
-      resolve = ((a)=>(b)=>a(b))(a);
-      reject = ((a)=>(b)=>a(b))(b);
+  e.respondWith(new Promise((a, b) => { /* eslint promise/param-names:off */
+    resolve = ((a) => (b) => a(b))(a);
+    reject = ((a) => (b) => a(b))(b);
   }));
+
   // Open the checkout page
-  e.openWindow(CHECKOUT_URL).then((windowClient)=>{
+  e.openWindow(CHECKOUT_URL).then((windowClient) => {
     if (windowClient === null) reject('Failed to open window');
-  }).catch((error)=>{
+  }).catch((error) => {
     reject(error);
   });
 });
@@ -110,13 +111,13 @@ const createCharge = (data) => {
       details: data.details,
       total: paymentRequestEvent.total
     }),
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json' }
   })
-  .then((response) => response.json())
-  .then((data) => {
-    resolve(data);
-  });
-}
+    .then((response) => response.json())
+    .then((data) => {
+      resolve(data);
+    });
+};
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);

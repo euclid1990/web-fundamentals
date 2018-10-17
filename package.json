@@ -1,11 +1,19 @@
 {
   "name": "service-workers",
   "scripts": {
-    "start": "node nodemon.js"
+    "start": "node nodemon.js",
+    "fix": "eslint . --fix"
   },
   "devDependencies": {
     "browser-sync": "^2.24.7",
     "cors-anywhere": "^0.4.1",
+    "eslint": "^5.7.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
     "express": "^4.16.3",
     "morgan": "^1.9.1",
     "nodemon": "^1.18.4",

@@ -14,10 +14,10 @@ self.addEventListener('install', event => {
         '/index.html',
         '/img/bird.png',
         '/img/cat.png',
-        '/img/pig.png',
+        '/img/pig.png'
       ]
     )).then(() => {
-      console.log('[' + cacheName + '] is created and stored.')
+      console.log('[' + cacheName + '] is created and stored.');
       // Make your new service worker activate sooner without wait until
       // the existing worker is controlling zero clients. (Note refresh does not affect number clients.)
       self.skipWaiting();
@@ -55,17 +55,17 @@ self.addEventListener('fetch', event => {
   });
 
   // Serve the [Cat] PNG from the cache if the request is same-origin and the path is '/pig.png'
-  if (url.origin == location.origin && url.pathname == '/img/pig.png') {
+  if (url.origin === location.origin && url.pathname === '/img/pig.png') {
     event.respondWith(caches.match('/img/cat.png'));
   }
 
   // Serve the [Bird] PNG from the cache if the request is same-origin and the path is '/bird.png'
-  if (url.origin == location.origin && url.pathname == '/img/bird.png') {
+  if (url.origin === location.origin && url.pathname === '/img/bird.png') {
     event.respondWith(caches.match('/img/bird.png'));
   }
 
   // Serve the [Index] HTML from the cache if the request is same-origin and the path is '/'
-  if (url.origin == location.origin && url.pathname == '/') {
+  if (url.origin === location.origin && url.pathname === '/') {
     event.respondWith(caches.match('/index.html'));
   }
 });

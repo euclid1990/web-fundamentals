@@ -2,7 +2,7 @@ importScripts('https://www.gstatic.com/firebasejs/5.5.3/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/5.5.3/firebase-messaging.js');
 
 const config = {
-  messagingSenderId: '990609591043',// '<SENDER_ID>'
+  messagingSenderId: '990609591043'// '<SENDER_ID>'
 };
 
 firebase.initializeApp(config);
@@ -19,4 +19,3 @@ messaging.setBackgroundMessageHandler(function(payload) {
 
   return self.registration.showNotification(notificationTitle, notificationOptions);
 });
-

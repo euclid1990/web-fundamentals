@@ -1,8 +1,9 @@
+/* eslint no-unused-vars:off */
 function createTester() {
   'use strict';
 
   var pouch = new PouchDB('pouch_test');
-  var lokiDB = new loki('loki_test');
+  var lokiDB = new loki('loki_test'); /* eslint new-cap:off */
   var lokiDocs = lokiDB.addCollection('docs', { indices: ['id'] });
   var dexieDB = new Dexie('dexie_test');
   dexieDB.version(1).stores({ docs: '++,id' });
@@ -62,18 +63,18 @@ function createTester() {
   }
 
   function imFromJSTest(docs) {
-    var obj = {}
+    var obj = {};
     for (var i = 0; i < docs.length; i++) {
-      obj['doc_' + i] = docs[i]
+      obj['doc_' + i] = docs[i];
     }
     Immutable.fromJS(obj);
   }
 
   function imMapMergeDeepTest(docs) {
     var imMap = new Immutable.Map();
-    var obj = {}
+    var obj = {};
     for (var i = 0; i < docs.length; i++) {
-      obj['doc_' + i] = docs[i]
+      obj['doc_' + i] = docs[i];
     }
     imMap.mergeDeep(obj);
   }
@@ -146,7 +147,7 @@ function createTester() {
   }
 
   function dexieTest(docs) {
-    return dexieDB.transaction('rw', dexieDB.docs, function () {
+    return dexieDB.transaction('rw', dexieDB.docs, function() {
       for (var i = 0; i < docs.length; i++) {
         var doc = docs[i];
         doc.id = 'doc_' + i;
@@ -156,26 +157,26 @@ function createTester() {
   }
 
   function idbTest(docs) {
-    return Promise.resolve().then(function () {
+    return Promise.resolve().then(function() {
       if (openIndexedDBReq) {
         // reuse the same event to avoid onblocked when deleting
         return openIndexedDBReq.result;
       }
-      return new Promise(function (resolve, reject) {
+      return new Promise(function(resolve, reject) {
         var req = openIndexedDBReq = indexedDB.open('test_idb', 1);
         req.onblocked = reject;
         req.onerror = reject;
-        req.onupgradeneeded = function (e) {
+        req.onupgradeneeded = function(e) {
           var db = e.target.result;
-          db.createObjectStore('docs', {keyPath: 'id'});
+          db.createObjectStore('docs', { keyPath: 'id' });
         };
-        req.onsuccess = function (e) {
+        req.onsuccess = function(e) {
           var db = e.target.result;
           resolve(db);
         };
       });
-    }).then(function (db) {
-      return new Promise(function (resolve, reject) {
+    }).then(function(db) {
+      return new Promise(function(resolve, reject) {
         var txn = db.transaction('docs', 'readwrite');
         var oStore = txn.objectStore('docs');
         for (var i = 0; i < docs.length; i++) {
@@ -191,20 +192,20 @@ function createTester() {
   }
 
   function webSQLTest(docs) {
-    return Promise.resolve().then(function () {
+    return Promise.resolve().then(function() {
       if (webSQLDB) {
         return;
       }
-      return new Promise(function (resolve, reject) {
+      return new Promise(function(resolve, reject) {
         webSQLDB = openDatabase('test_websql', 1, 'test_websql', 5000);
-        webSQLDB.transaction(function (txn) {
+        webSQLDB.transaction(function(txn) {
           txn.executeSql(
             'create table if not exists docs (id text unique, json text);');
         }, reject, resolve);
       });
-    }).then(function () {
-      return new Promise(function (resolve, reject) {
-        webSQLDB.transaction(function (txn) {
+    }).then(function() {
+      return new Promise(function(resolve, reject) {
+        webSQLDB.transaction(function(txn) {
           for (var i = 0; i < docs.length; i++) {
             var id = 'doc_' + i;
             var doc = docs[i];
@@ -276,16 +277,16 @@ function createTester() {
     lokiDocs.chain().remove();
 
     var promises = [
-      new Promise(function (resolve, reject) {
+      new Promise(function(resolve, reject) {
         if (typeof openDatabase === 'undefined') {
           return resolve();
         }
         var webSQLDB = openDatabase('test_websql', 1, 'test_websql', 5000);
-        webSQLDB.transaction(function (txn) {
+        webSQLDB.transaction(function(txn) {
           txn.executeSql('delete from docs;');
         }, resolve, resolve);
       }),
-      new Promise(function (resolve, reject) {
+      new Promise(function(resolve, reject) {
         if (openIndexedDBReq) {
           openIndexedDBReq.result.close();
         }
@@ -294,22 +295,22 @@ function createTester() {
         req.onerror = reject;
         req.onblocked = reject;
       }),
-      Promise.resolve().then(function () {
+      Promise.resolve().then(function() {
         if (typeof localforage !== 'undefined') {
           return localForageDB.clear();
         }
       }),
-      Promise.resolve().then(function () {
+      Promise.resolve().then(function() {
         if (typeof openDatabase !== 'undefined' &&
             typeof localforage !== 'undefined') {
           return localForageWebSQLDB.clear();
         }
       }),
       dexieDB.docs.clear(),
-      pouch.destroy().then(function () {
+      pouch.destroy().then(function() {
         pouch = new PouchDB('pouch_test');
       }),
-      Promise.resolve().then(function () {
+      Promise.resolve().then(function() {
         return Promise.resolve();
       })
     ];
@@ -321,5 +322,5 @@ function createTester() {
     getTest: getTest,
     cleanup: cleanup,
     createDocs: createDocs
-  }
+  };
 }

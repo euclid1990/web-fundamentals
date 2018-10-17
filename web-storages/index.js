@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function() {
   'use strict';
 
   var tester = createTester();
@@ -24,17 +24,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function waitForUI() {
-    return new Promise(function (resolve) {
+    return new Promise(function(resolve) {
       display.getBoundingClientRect();
-      requestAnimationFrame(function () {
+      requestAnimationFrame(function() {
         requestAnimationFrame(resolve);
       });
     });
   }
 
   function workerPromise(message) {
-    return new Promise(function (resolve, reject) {
-
+    return new Promise(function(resolve, reject) {
       function cleanup() {
         worker.removeEventListener('message', onSuccess);
         worker.removeEventListener('error', onError);
@@ -60,8 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-
-  document.getElementById('insertButton').addEventListener('click', function () {
+  document.getElementById('insertButton').addEventListener('click', function() {
     disableButtons(true);
     var dbTypeChoice = getChoice('db');
     var numDocsChoice = getChoice('numDocs');
@@ -71,14 +69,14 @@ document.addEventListener("DOMContentLoaded", function () {
     display.innerHTML = 'Inserting ' + numDocs + ' docs using ' +
       dbTypeChoice.label + (useWorker ? ' in a worker' : '') + '...';
 
-    waitForUI().then(function () {
+    waitForUI().then(function() {
       var startTime = Date.now();
       if (useWorker) {
         return workerPromise({
           action: 'test',
           dbType: dbTypeChoice.value,
           numDocs: numDocs
-        }).then(function (e) {
+        }).then(function(e) {
           if (!e.data.success) {
             throw new Error('did not work');
           }
@@ -89,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
           action: 'test',
           dbType: dbTypeChoice.value,
           numDocs: tester.createDocs(numDocs)
-        }).then(function (e) {
+        }).then(function(e) {
           if (!e.data.success) {
             throw new Error('did not work');
           }
@@ -98,37 +96,37 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       var fun = tester.getTest(dbTypeChoice.value);
 
-      return Promise.resolve().then(function () {
+      return Promise.resolve().then(function() {
         return fun(numDocs);
-      }).then(function () {
+      }).then(function() {
         return Date.now() - startTime;
       });
-    }).then(function (timeSpent) {
-      display.innerHTML += "\nTook " + timeSpent + "ms";
+    }).then(function(timeSpent) {
+      display.innerHTML += '\nTook ' + timeSpent + 'ms';
       disableButtons(false);
-    }).catch(function (e) {
+    }).catch(function(e) {
       disableButtons(false);
-      display.innerHTML += "\nError: " + e;
+      display.innerHTML += '\nError: ' + e;
       console.error(e);
     });
   });
 
-  document.getElementById('deleteButton').addEventListener('click', function () {
+  document.getElementById('deleteButton').addEventListener('click', function() {
     display.innerHTML = 'Deleting...';
     disableButtons(true);
     var useWorker = getChoice('worker').value === 'true';
 
-    waitForUI().then(function () {
+    waitForUI().then(function() {
       if (useWorker) {
         return workerPromise({ action: 'cleanup' });
       }
       return tester.cleanup();
-    }).then(function () {
+    }).then(function() {
       disableButtons(false);
       display.innerHTML += '\nDone.';
-    }).catch(function (e) {
+    }).catch(function(e) {
       disableButtons(false);
-      display.innerHTML += "\nError: " + e;
+      display.innerHTML += '\nError: ' + e;
       console.error(e);
     });
   });

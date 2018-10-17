@@ -48,6 +48,7 @@ function log() {
   log.scrollTop = log.scrollHeight;
 }
 
+/* eslint no-unused-vars:off */
 function clearLog() {
   document.getElementById('log').textContent = '';
 }
@@ -58,6 +59,7 @@ clipboard.on('success', function(e) {
   e.clearSelection();
 });
 
+/* eslint no-unused-vars:off */
 const app = (() => {
   'use strict';
 
@@ -74,7 +76,7 @@ const app = (() => {
 
   // Firebase configuration
   const config = {
-    messagingSenderId: '990609591043',// '<SENDER_ID>'
+    messagingSenderId: '990609591043'// '<SENDER_ID>'
   };
 
   // Init firebase app
@@ -84,7 +86,7 @@ const app = (() => {
   const messaging = firebase.messaging();
 
   // Add the public key generated from the console here.
-  messaging.usePublicVapidKey('BIwd0hGrfgXfUEYmOjqJo3Pj6LAQGUrxq_ke_BFEl_TMYj_zX6XEtlyMU3BwzComriL3NxX-ZOlIqnYTKpfZxEI'/*'<YOUR_PUBLIC_VAPID_KEY_HERE>'*/);
+  messaging.usePublicVapidKey('BIwd0hGrfgXfUEYmOjqJo3Pj6LAQGUrxq_ke_BFEl_TMYj_zX6XEtlyMU3BwzComriL3NxX-ZOlIqnYTKpfZxEI'/* '<YOUR_PUBLIC_VAPID_KEY_HERE>' */);
 
   // Handle incoming messages. Called when:
   // - A message is received while the app has focus
@@ -117,18 +119,18 @@ const app = (() => {
       },
       body: JSON.stringify(subscription)
     })
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error('Bad status code from server.');
-      }
-      return response.json();
-    })
-    .then(function(data) {
-      if (!data.results || data.results.error) {
-        throw new Error('Bad response from server.');
-      }
-      log('> HTTP 200 OK', data);
-    });
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Bad status code from server.');
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        if (!data.results || data.results.error) {
+          throw new Error('Bad response from server.');
+        }
+        log('> HTTP 200 OK', data);
+      });
   });
 
   pushButton.addEventListener('click', (e) => {
@@ -137,7 +139,7 @@ const app = (() => {
       to: '/topics/news',
       notification: {
         body: `Message created at ${new Date()}`,
-        title: 'FCM Message',
+        title: 'FCM Message'
       }
     };
     return fetch('https://fcm.googleapis.com/fcm/send', {
@@ -148,18 +150,18 @@ const app = (() => {
       },
       body: JSON.stringify(notification)
     })
-    .then(function(response) {
-      if (!response.ok) {
-        throw new Error('Bad status code from server.');
-      }
-      return response.json();
-    })
-    .then(function(data) {
-      if (!data.message_id) {
-        throw new Error('Bad response from server.');
-      }
-      log('> HTTP 200 OK', data);
-    });
+      .then(function(response) {
+        if (!response.ok) {
+          throw new Error('Bad status code from server.');
+        }
+        return response.json();
+      })
+      .then(function(data) {
+        if (!data.message_id) {
+          throw new Error('Bad response from server.');
+        }
+        log('> HTTP 200 OK', data);
+      });
   });
 
   serverKeyInput.addEventListener('change', (e) => {
@@ -183,43 +185,42 @@ const app = (() => {
       console.log('Service Worker and Push is supported');
 
       navigator.serviceWorker.register('service-worker.js')
-      .then(registration => {
-        console.log('Service Worker is registered', registration);
-        // Use own service worker for receiving push messages
-        messaging.useServiceWorker(registration);
-        // Callback fired if Instance ID token is updated.
-        messaging.onTokenRefresh(() => {
-          messaging.getToken().then((refreshedToken) => {
-            log('Token refreshed. \n> ', refreshedToken);
-            token = refreshedToken;
-            curl(serverKey, token);
-          }).catch(function(err) {
-            console.error('Unable to retrieve refreshed token.', err);
+        .then(registration => {
+          console.log('Service Worker is registered', registration);
+          // Use own service worker for receiving push messages
+          messaging.useServiceWorker(registration);
+          // Callback fired if Instance ID token is updated.
+          messaging.onTokenRefresh(() => {
+            messaging.getToken().then((refreshedToken) => {
+              log('Token refreshed. \n> ', refreshedToken);
+              token = refreshedToken;
+              curl(serverKey, token);
+            }).catch(function(err) {
+              console.error('Unable to retrieve refreshed token.', err);
+            });
           });
-        });
 
-        // Get Instance ID token. Initially this makes a network call, once retrieved
-        // subsequent calls to getToken will return from cache.
-        messaging.getToken().then((currentToken) => {
-          if (currentToken) {
-            log('Current token.\n> ', currentToken);
-            token = currentToken;
-            curl(serverKey, token);
-          } else {
-            log('No Instance ID token available. Request permission to generate one.');
-          }
-        }).catch(function(err) {
-          console.error('An error occurred while retrieving token. ', err);
-        });
+          // Get Instance ID token. Initially this makes a network call, once retrieved
+          // subsequent calls to getToken will return from cache.
+          messaging.getToken().then((currentToken) => {
+            if (currentToken) {
+              log('Current token.\n> ', currentToken);
+              token = currentToken;
+              curl(serverKey, token);
+            } else {
+              log('No Instance ID token available. Request permission to generate one.');
+            }
+          }).catch(function(err) {
+            console.error('An error occurred while retrieving token. ', err);
+          });
 
-        initializeUI();
-      })
-      .catch(err => {
-        console.error('Service Worker Error', err);
-      });
+          initializeUI();
+        })
+        .catch(err => {
+          console.error('Service Worker Error', err);
+        });
     });
   } else {
     log('Push messaging is not supported');
   }
-
 })();

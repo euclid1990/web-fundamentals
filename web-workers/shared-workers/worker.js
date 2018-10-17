@@ -25,17 +25,15 @@ onconnect = function(e) {
     switch (data.cmd) {
       case '$c':
         // Broadcasting messages to all workers
-        for (let w in workers)
-          workers[w].port.postMessage({ cmd: '$c' });
+        for (let w in workers) { workers[w].port.postMessage({ cmd: '$c' }); }
         break;
       case '$p':
         ++p;
         // Broadcasting messages to all workers
-        for (let w in workers)
-          workers[w].port.postMessage({ msg: data.msg + ' #' + p });
+        for (let w in workers) { workers[w].port.postMessage({ msg: data.msg + ' #' + p }); }
         break;
       default:
         port.postMessage({ msg: 'Sent message from Background. #worker' + name + ' #' + data.msg }); /* e.target.postMessage('pong'); would work also */
     };
-  }
-}
+  };
+};
