@@ -5,7 +5,7 @@
         <strong class="red-text">{{ message }}</strong>
       </div>
       <div class="weather-location">
-        <h2>Location</h2>
+        <h2>Location Search</h2>
         <button class="mdc-fab mdc-fab--mini" aria-label="Favorite">
           <span class="mdc-fab__icon material-icons">location_searching</span>
         </button>

@@ -1,16 +1,16 @@
 version: 2
 jobs:
-  # build:
-  #   docker:
-  #     - image: circleci/node:8.12-jessie-browsers-legacy
-  #   steps:
-  #     - checkout
-  #     - run:
-  #         name: Install dependencies
-  #         command: yarn install
-  #     - run:
-  #         name: Install dependencies
-  #         command: yarn lint
+  build:
+    docker:
+      - image: circleci/node:8.12-jessie-browsers-legacy
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - run:
+          name: Install dependencies
+          command: yarn lint
   deploy:
     docker:
       - image: euclid1990/circleci-buildpack
@@ -61,10 +61,10 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      # - build
+      - build
       - deploy:
           requires:
-            # - build
+            - build
           filters:
             branches:
               only: master
