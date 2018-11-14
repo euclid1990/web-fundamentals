@@ -55,10 +55,12 @@ jobs:
             docker push registry.heroku.com/$HEROKU_APP_NAME/web
       - run:
           name: Heroku container release
+          working_directory: ~/web-fundamentals/pwa-in-production
           command: |
-            curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-            heroku container:login
-            heroku container:release web --app $HEROKU_APP_NAME
+            # curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            # heroku container:login
+            # heroku container:release web --app $HEROKU_APP_NAME
+            bash .circleci/heroku-container-release.sh
 
 workflows:
   version: 2
