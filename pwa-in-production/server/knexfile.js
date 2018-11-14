@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const dotenv = require('dotenv').config();
 const utils = require('./utils');
 
@@ -27,7 +28,11 @@ module.exports = {
     },
     pool: { min: 2, max: 10 },
     migrations: {
+      directory: './database/migrations',
       tableName: 'migrations'
+    },
+    seeds: {
+      directory: './database/seeds'
     }
   },
   production: {
@@ -37,12 +42,16 @@ module.exports = {
       port: utils.env('DB_PORT'),
       database: utils.env('DB_DATABASE'),
       user: utils.env('DB_USERNAME'),
-      password: utils.env('DB_PASSWORD')
+      password: utils.env('DB_PASSWORD'),
+      ssl: true
     },
     pool: { min: 2, max: 10 },
     migrations: {
+      directory: './database/migrations',
       tableName: 'migrations'
+    },
+    seeds: {
+      directory: './database/seeds'
     }
   }
 };
-

@@ -1,0 +1,4 @@
+server/node_modules
+server/pgdata
+client/node_modules
+*.log

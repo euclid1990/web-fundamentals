@@ -1,7 +1,9 @@
 {
   "name": "service-workers",
+  "license": "MIT",
   "scripts": {
     "start": "node nodemon.js",
+    "lint": "eslint .",
     "fix": "eslint . --fix"
   },
   "devDependencies": {

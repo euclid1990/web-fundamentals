@@ -21,7 +21,9 @@ module.exports = {
     "no-new": "warn",
     "eol-last": ["error", "always"],
     "no-undef": "off",
-    "no-unused-expressions": "off"
+    "no-unused-expressions": "off",
+    "new-cap": "off",
+    "no-return-assign": "off"
   },
   "globals": {
     "window": true,

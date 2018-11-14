@@ -1,9 +1,10 @@
+/* eslint-disable no-unused-vars */
 const dotenv = require('dotenv').config();
 const http = require('http');
 const jsonwebtoken = require('jsonwebtoken');
 const status = require('http-status');
 const koaBody = require('koa-body');
-const koaLogger = require('koa-logger')
+const koaLogger = require('koa-logger');
 const koaJwt = require('koa-jwt');
 const koaRouter = require('koa-router')();
 const koaCors = require('@koa/cors');
@@ -46,7 +47,6 @@ koaRouter.post('/sign-in', act.auth.signIn)
   .get('/cryptocurrencies', jwt, act.cryptocurrencies.index)
   .get('/cryptocurrencies/:id', jwt, act.cryptocurrencies.show);
 app.use(koaRouter.routes());
-
 
 app.use(async (ctx) => {
   ctx.body = 'PWA Server';

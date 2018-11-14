@@ -1,7 +1,8 @@
 {
+  "license": "MIT",
   "scripts": {
     "watch": "webpack --watch",
-    "start": "webpack-dev-server --open",
+    "start": "DASHBOARD=false webpack-dev-server --config webpack.config.js",
     "build": "webpack",
     "fix": "eslint --fix src --ext .js,.vue"
   },
@@ -55,6 +56,8 @@
     "vue-template-compiler": "^2.5.17",
     "webpack": "^4.16.5",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.7"
+    "webpack-dashboard": "^2.0.0",
+    "webpack-dev-server": "^3.1.7",
+    "workbox-webpack-plugin": "^3.6.3"
   }
 }

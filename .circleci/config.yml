@@ -1,0 +1,73 @@
+version: 2
+jobs:
+  # build:
+  #   docker:
+  #     - image: circleci/node:8.12-jessie-browsers-legacy
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: yarn install
+  #     - run:
+  #         name: Install dependencies
+  #         command: yarn lint
+  deploy:
+    docker:
+      - image: buildpack-deps:trusty
+    working_directory: ~/web-fundamentals
+    steps:
+      - run:
+          name: Install dependencies
+          command: |
+            apt-get update
+            apt-get install -y gettext-base
+      - checkout
+      - run:
+          name: Create client environment file
+          working_directory: ~/web-fundamentals/pwa-in-production/client
+          command: envsubst < .env.tpl > .env
+      - run:
+          name: Create server environment file
+          working_directory: ~/web-fundamentals/pwa-in-production/server
+          command: envsubst < .env.tpl > .env
+      - setup_remote_docker:
+          version: 17.03.0-ce
+          docker_layer_caching: true
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+      - run:
+          name: Login private registry on Heroku
+          command: docker login --username=_ --password=$HEROKU_API_KEY registry.heroku.com
+      - run:
+          name: Build the web application image
+          working_directory: ~/web-fundamentals/pwa-in-production
+          command: docker build --file .prod/web/Dockerfile --tag $HEROKU_APP_NAME:latest .
+      - run:
+          name: Push new image
+          command: |
+            docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
+            docker push registry.heroku.com/$HEROKU_APP_NAME/web
+      - run:
+          name: Heroku container release
+          command: |
+            curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            heroku container:login
+            heroku container:release web --app $HEROKU_APP_NAME
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      # - build
+      - deploy:
+          requires:
+            # - build
+          filters:
+            branches:
+              only: master

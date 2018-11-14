@@ -6,7 +6,7 @@ const utils = require('./utils');
 
 /* ====== Action definitions ====== */
 const auth = {
-  signIn: async (ctx) =>  {
+  signIn: async (ctx) => {
     console.log(utils.nowUtc());
     console.log(utils.utcToLocal(utils.nowUtc()));
     let params = ctx.request.body;
@@ -14,14 +14,14 @@ const auth = {
     const rules = {
       email: 'required|email',
       password: 'required'
-    }
+    };
     let validation = new validator(params, rules);
     if (validation.fails()) {
       return ctx.body = {
         code: status.BAD_REQUEST,
         errors: validation.errors.all(),
         message: ''
-      }
+      };
     }
     /* Get corresponding user information */
     let user = await ctx.db('users').select('*').where({ email: params['email'] }).whereNull('deleted_at').first();
@@ -30,11 +30,11 @@ const auth = {
         code: status.UNAUTHORIZED,
         errors: {},
         message: 'The email or password is incorrect.'
-      }
+      };
     }
     /* Return jwt signed with user's id token */
     let token = jsonwebtoken.sign({
-      id: user.id,
+      id: user.id
     }, utils.env('JWT_SECRET'), { expiresIn: '24h' });
     user.password = token;
     user.signed_in_at = utils.nowUtc();
@@ -53,14 +53,14 @@ const auth = {
       name: 'required',
       email: 'required|email',
       password: 'required'
-    }
+    };
     let validation = new validator(params, rules);
     if (validation.fails()) {
       return ctx.body = {
         code: status.BAD_REQUEST,
         errors: validation.errors.all(),
         message: ''
-      }
+      };
     }
     /* Get corresponding user information */
     let user = await ctx.db('users').select('*').where({ email: params['email'] }).first();
@@ -69,7 +69,7 @@ const auth = {
         code: status.CONFLICT,
         errors: {},
         message: 'The email address is already in use.'
-      }
+      };
     }
     try {
       let id = await ctx.db('users').insert({
@@ -81,9 +81,9 @@ const auth = {
       id = id[0];
       /* Return jwt signed with user's id token */
       let token = jsonwebtoken.sign({
-        id: id,
+        id: id
       }, utils.env('JWT_SECRET'), { expiresIn: '24h' });
-      user = await ctx.db('users').select('*').where({ id: id }).first()
+      user = await ctx.db('users').select('*').where({ id: id }).first();
       user.password = token;
       user.signed_in_at = utils.nowUtc();
 
@@ -93,12 +93,12 @@ const auth = {
         message: 'Signed up successfully.',
         data: { user }
       };
-    } catch(e) {
+    } catch (e) {
       return ctx.body = {
         code: status.INTERNAL_SERVER_ERROR,
         errors: {},
         message: e.message
-      }
+      };
     }
   },
   signOut: async (ctx) => {
@@ -109,7 +109,7 @@ const auth = {
       data: {}
     };
   }
-}
+};
 
 const cryptocurrencies = {
   index: async (ctx) => {
@@ -137,10 +137,9 @@ const cryptocurrencies = {
       }
     };
   }
-}
+};
 
 module.exports = {
   auth,
   cryptocurrencies
-}
-
+};

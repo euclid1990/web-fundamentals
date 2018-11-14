@@ -19,4 +19,4 @@ module.exports = {
   env,
   nowUtc,
   utcToLocal
-}
+};

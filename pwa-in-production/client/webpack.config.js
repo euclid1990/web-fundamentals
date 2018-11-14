@@ -8,10 +8,15 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Dashboard = require('webpack-dashboard');
+const DashboardPlugin = require('webpack-dashboard/plugin');
+const workboxPlugin = require('workbox-webpack-plugin');
+const dashboardMode = JSON.parse(env('DASHBOARD', false)) ? true : false;
 const devMode = env('NODE_ENV') !== 'production';
 const srcPath = env('SOURCE_PATH', 'src');
 const buildPath = env('BUILD_PATH', 'build');
 const autoprefixer = require('autoprefixer');
+const apiUrl = env('API_URL');
 
 // Get environment variable function
 function env(e, d = '') {
@@ -42,6 +47,9 @@ function generateSecretConfig() {
 }
 
 let configsPath = generateSecretConfig();
+if (dashboardMode) {
+  var dashboard = new Dashboard();
+}
 
 module.exports = () => {
   return {
@@ -58,69 +66,79 @@ module.exports = () => {
         configs: configsPath
       }
     },
-    devtool: devMode ? 'inline-source-map' : false,
+    devtool: devMode ? 'cheap-eval-source-map' : false,
     devServer: {
       contentBase: `${buildPath}`,
-      historyApiFallback: true
+      historyApiFallback: true,
+      port: 8080,
+      quiet: dashboardMode,   // Lets WebpackDashboard output all build information
+      open: true              // Open web browser
     },
     module: {
       rules: [
-      {
-        test: /\.(js)$/,
-        loader: 'eslint-loader'
-      },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      },
-      {
-        test: /\.html$/,
-        loader: 'html-loader',
-      },
-      {
-        test: /\.scss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              publicPath: '../'
+        {
+          test: /\.(js)$/,
+          loader: 'eslint-loader'
+        },
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader',
+          options: {}
+        },
+        {
+          test: /\.scss$/,
+          use: [
+            {
+              loader: MiniCssExtractPlugin.loader,
+              options: {
+                publicPath: '../'
+              }
+            },
+            {
+              loader: 'css-loader',
+              options: { importLoaders: 1 }
+            },
+            { loader: 'postcss-loader' },
+            {
+              loader: 'sass-loader',
+              options: {
+                includePaths: [path.resolve(__dirname, 'node_modules')]
+              }
             }
-          },
-          {
-            loader: 'css-loader',
-            options: { importLoaders: 1 }
-          },
-          { loader: 'postcss-loader' },
-          {
-            loader: 'sass-loader',
+          ]
+        },
+        {
+          test: /\.(png|svg|jpg|gif)$/,
+          use: [{
+            loader: 'file-loader',
             options: {
-              includePaths: [path.resolve(__dirname, 'node_modules')]
+              name: '[name].[ext]',
+              useRelativePath: true,
+              outputPath: 'img',
+              context: 'src/images/img'
+            }
+          }]
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/,
+          use: [{
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts',
+            }
+          }]
+        },
+        {
+          test: /\.html$/,
+          use: {
+            loader: 'html-loader',
+            options: {
+              interpolate: true,
+              attrs: ['img:src']
             }
           }
-        ]
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            useRelativePath: true,
-            outputPath: 'img',
-            context: 'src/images/img'
-          }
-        }]
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [{
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]',
-            outputPath: 'fonts',
-          }
-        }]
-      }
+        }
       ]
     },
     optimization: {
@@ -149,7 +167,48 @@ module.exports = () => {
         template: path.join(__dirname, `${srcPath}/index.html`),
         filename: 'index.html',
         chunks: ['vendors', 'main']
-      })
+      }),
+      new workboxPlugin.GenerateSW({
+        swDest: 'service-worker.js',
+        importWorkboxFrom: 'local',
+        clientsClaim: true,
+        skipWaiting: true,
+        navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+            handler: 'cacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: {
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+                maxEntries: 30,
+              }
+            }
+          },
+          {
+            urlPattern: new RegExp(`${apiUrl}/*`),
+            handler: 'cacheFirst',
+            options: {
+              cacheName: 'currencies',
+              expiration: {
+                maxAgeSeconds: 60 * 60
+              }
+            }
+          },
+          {
+            urlPattern: new RegExp('https://query.yahooapis.com/*'),
+            handler: 'networkFirst',
+            options: {
+              cacheName: 'weathers',
+              expiration: {
+                maxAgeSeconds: 60 * 60 * 24
+              }
+            }
+          }
+        ]
+      }),
+      dashboardMode ? new DashboardPlugin(dashboard.setData) : () => {}
     ]
   };
 };
