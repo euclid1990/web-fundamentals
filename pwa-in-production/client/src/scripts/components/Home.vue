@@ -124,7 +124,7 @@
       addToHomeScreen.addEventListener('click', (e) => {
         // hide our user interface that shows our A2HS button
         addToHomeScreen.style.display = 'none';
-        if (!!deferredPrompt.prompt) {
+        if (!!deferredPrompt) {
           // Show the prompt
           deferredPrompt.prompt();
           // Wait for the user to respond to the prompt
