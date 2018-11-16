@@ -30,5 +30,8 @@ module.exports = {
         "indent": "off"
       }
     }
-  ]
+  ],
+  "globals": {
+    "workbox": true
+  }
 };

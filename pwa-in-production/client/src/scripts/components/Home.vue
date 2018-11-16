@@ -37,6 +37,7 @@
             <span class="mdc-top-app-bar__title">PWA App</span>
           </section>
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+            <a id="add-home" class="material-icons mdc-top-app-bar__action-item deferred-prompt" href="#">cloud_download</a>
             <router-link to="/sign-out" class="material-icons mdc-top-app-bar__action-item" aria-label="Sign out" alt="Sign out">exit_to_app</router-link>
           </section>
         </div>
@@ -89,6 +90,7 @@
       const topAppBar = document.getElementById('app-bar');
       const helpActivation = document.getElementById('help-activation');
       const helpDialog = document.getElementById('help-dialog');
+      const addToHomeScreen = document.getElementById('add-home');
 
       list.MDCList.wrapFocus = true;
       listLink.forEach(link => addEventListener('click', function(evt) {
@@ -104,6 +106,38 @@
       helpActivation.addEventListener('click', function(evt) {
         helpDialog.MDCDialog.lastFocusedTarget = evt.target;
         helpDialog.MDCDialog.show();
+      });
+
+      console.log('Perform [Add to Home Screen] criteria checking!');
+      // Listen for beforeinstallprompt
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent Chrome 67 and earlier from automatically showing the prompt
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        console.log('Add to home screen criteria are met');
+        // Update UI notify the user they can add to home screen
+        addToHomeScreen.classList.remove('deferred-prompt');
+      });
+
+      addToHomeScreen.addEventListener('click', (e) => {
+        // hide our user interface that shows our A2HS button
+        addToHomeScreen.style.display = 'none';
+        if (!!deferredPrompt.prompt) {
+          // Show the prompt
+          deferredPrompt.prompt();
+          // Wait for the user to respond to the prompt
+          deferredPrompt.userChoice
+            .then((choiceResult) => {
+              if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+              } else {
+                console.log('User dismissed the A2HS prompt');
+              }
+              deferredPrompt = null;
+          });
+        }
       });
     }
   };

@@ -131,6 +131,10 @@ body {
   .mdc-drawer-app-content {
     flex: auto;
     overflow: auto;
+
+    .deferred-prompt {
+      color: #ded3d3;
+    }
   }
 
   .main-content {

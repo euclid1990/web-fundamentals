@@ -3,50 +3,53 @@
   "short_name": "Weather",
   "icons": [
     {
-      "src": "img/icons/bitcoin-72.png",
+      "src": "img/icons/puzzle-72.png",
       "type": "image/png",
       "sizes": "72x72"
     },
     {
-      "src": "img/icons/bitcoin-96.png",
+      "src": "img/icons/puzzle-96.png",
       "type": "image/png",
       "sizes": "96x96"
     },
     {
-      "src": "img/icons/bitcoin-128.png",
+      "src": "img/icons/puzzle-128.png",
       "type": "image/png",
       "sizes": "128x128"
     },
     {
-      "src": "img/icons/bitcoin-144.png",
+      "src": "img/icons/puzzle-144.png",
       "type": "image/png",
       "sizes": "144x144"
     },
     {
-      "src": "img/icons/bitcoin-152.png",
+      "src": "img/icons/puzzle-152.png",
       "type": "image/png",
       "sizes": "152x152"
     },
     {
-      "src": "img/icons/bitcoin-192.png",
+      "src": "img/icons/puzzle-192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "img/icons/bitcoin-256.png",
+      "src": "img/icons/puzzle-256.png",
       "type": "image/png",
       "sizes": "256x256"
     },
     {
-      "src": "img/icons/bitcoin-384.png",
+      "src": "img/icons/puzzle-384.png",
       "type": "image/png",
       "sizes": "384x384"
     },
     {
-      "src": "img/icons/bitcoin-512.png",
+      "src": "img/icons/puzzle-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": "/index.html"
+  "background_color": "#3367D6",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#3367D6"
 }
