@@ -3,7 +3,7 @@
     <form class="sign-in-form" action="#" @submit.prevent="validateBeforeSubmit">
       <section class="sign-in-header">
         <img src="../../images/icons/puzzle.svg" width="100" height="100">
-        <h1>PWA App</h1>
+        <h1>PWA App Truong</h1>
       </section>
       <section class="sign-in-body">
         <div v-if="message !== ''">
