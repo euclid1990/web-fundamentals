@@ -173,13 +173,14 @@ module.exports = () => {
         importWorkboxFrom: 'local',
         clientsClaim: true,
         skipWaiting: true,
+        navigateFallbackBlacklist: [/manifest\.json/],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
-            urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+            urlPattern: /\.(?:png|jpg|jpeg|svg|json)$/,
             handler: 'cacheFirst',
             options: {
-              cacheName: 'images',
+              cacheName: 'assets',
               expiration: {
                 maxAgeSeconds: 60 * 60 * 24 * 365,
                 maxEntries: 30,
