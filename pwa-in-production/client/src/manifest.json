@@ -1,6 +1,6 @@
 {
-  "name": "Weather",
-  "short_name": "Weather",
+  "name": "PWA App",
+  "short_name": "PWA",
   "icons": [
     {
       "src": "img/icons/puzzle-72.png",
